@@ -13,6 +13,8 @@ class ShopResource extends JsonResource
             'name' => $this->name,
             'user_type' => $this->user_type,
             'phone' => $this->phone,
+            'rating' => $this->receivedRatings->first()?->rating ?? null,
+            'rating_average' => $this->averageRating(),
             'address' => $this->address,
             'latitude' => $this->latitude,
             'longitude' => $this->longitude,

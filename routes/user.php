@@ -2,9 +2,18 @@
 use App\Features\Profile\Present\Controllers\ProfileUserController;
 use App\Features\Notifications\Present\Controllers\NotificationsApiController;
 use App\Features\Shops\Present\Controllers\ShopsController;
+use App\Features\Ratings\Present\Controllers\RatingsController;
 Route::apiResource(
     'shops',
     ShopsController::class,
+);
+Route::apiResource(
+    'shops',
+    ShopsController::class,
+);
+Route::apiResource(
+    'ratings',
+    RatingsController::class,
 );
 Route::get('/notifications', [NotificationsApiController::class, 'get']);
 Route::apiResource('/profile', ProfileUserController::class);
