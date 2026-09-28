@@ -2,9 +2,10 @@
 
 namespace App\Features\Ratings\Data\Models;
 
+use App\Features\Users\Data\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use App\Features\Users\Data\Models\User;
+
 class Rating extends Model
 {
     protected $fillable = [
@@ -13,10 +14,12 @@ class Rating extends Model
         'rating',
         'comment',
     ];
+
     public function evaluator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'evaluator_id');
     }
+
     public function evaluated(): BelongsTo
     {
         return $this->belongsTo(User::class, 'evaluated_id');

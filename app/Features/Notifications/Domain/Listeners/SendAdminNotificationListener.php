@@ -2,10 +2,10 @@
 
 namespace App\Features\Notifications\Domain\Listeners;
 
-use App\Features\Users\Domain\Events\UserRegisteredEvent;
 use App\Features\Firebase\FirebaseAuthService;
 use App\Features\Notifications\Data\Models\Notification;
 use App\Features\Notifications\Domain\Notifications\NewUserRegisteredNotification;
+use App\Features\Users\Domain\Events\UserRegisteredEvent;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -19,21 +19,22 @@ class SendAdminNotificationListener
                 ->whereIn('role_id', [1, 2])
                 ->pluck('model_id')
                 ->toArray();
-            if (empty($adminIds))
+            if (empty($adminIds)) {
                 return;
+            }
             $notification = Notification::create([
                 'title' => 'مستخدم جديد سجل الآن!',
                 'body' => $event->user->name,
                 'type' => 'new_user_registered',
                 'data' => [
-                    'user_id' => $event->user->id
+                    'user_id' => $event->user->id,
                 ],
             ]);
             $validAdminIds = DB::table('users')
                 ->whereIn('id', $adminIds)
                 ->pluck('id')
                 ->toArray();
-            $pivotData = collect($validAdminIds)->map(fn($id) => [
+            $pivotData = collect($validAdminIds)->map(fn ($id) => [
                 'notification_id' => $notification->id,
                 'user_id' => $id,
                 'created_at' => now(),
@@ -46,10 +47,10 @@ class SendAdminNotificationListener
                 ->filter()
                 ->toArray();
             $notificationObject = new NewUserRegisteredNotification($event->user, $notification->id);
-            $firebaseService = new FirebaseAuthService();
+            $firebaseService = new FirebaseAuthService;
             $firebaseService->getMessaging()->sendMulticast($notificationObject->toFirebase(), $tokens);
         } catch (\Throwable $e) {
-            Log::error('FCM Error: ' . $e->getMessage());
+            Log::error('FCM Error: '.$e->getMessage());
         }
     }
 }

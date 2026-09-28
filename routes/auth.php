@@ -1,6 +1,7 @@
 <?php
-use Illuminate\Support\Facades\Route;
+
 use App\Features\Users\Present\Http\Controllers\AuthController;
+use Illuminate\Support\Facades\Route;
 
 Route::post('/check', [AuthController::class, 'check']);
 Route::post('/auth-token', [AuthController::class, 'authToken']);
@@ -11,6 +12,6 @@ Route::get('/test', function () {
         'status' => 'success',
         'message' => 'Auth routes are working ✅',
         'timestamp' => now(),
-        'route' => 'auth.test'
+        'route' => 'auth.test',
     ], 200);
 });

@@ -2,16 +2,17 @@
 
 namespace App\Features\Profile\Present\Controllers;
 
+use App\Features\Firebase\Domain\UseCases\FirebaseUseCases;
+use App\Features\Storage\Services\S3Service;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Features\Users\Data\Models\User;
-use App\Features\Storage\Services\S3Service;
-use App\Features\Firebase\Domain\UseCases\FirebaseUseCases;
 
 class ProfileUserController
 {
     private $s3Service;
+
     private $firebaseUseCases;
+
     public function __construct(
         S3Service $s3Service,
         FirebaseUseCases $firebaseUseCases
@@ -19,6 +20,7 @@ class ProfileUserController
         $this->s3Service = $s3Service;
         $this->firebaseUseCases = $firebaseUseCases;
     }
+
     public function index(Request $request)
     {
         try {
@@ -32,15 +34,17 @@ class ProfileUserController
                 'role' => $user->getRoleNames()->first(),
                 'created_at' => $user->created_at->format('Y-m-d H:i:s'),
             ];
+
             return successRes($profileData);
         } catch (\Exception $e) {
             return failureRes($e->getMessage());
         }
     }
+
     public function presigned(Request $request)
     {
         $user = Auth::guard('sanctum')->user();
-        if (!$user) {
+        if (! $user) {
             return response()->json([
                 'status' => false,
                 'message' => 'User not authenticated',
@@ -51,8 +55,10 @@ class ProfileUserController
             path: "users/profiles/avatar/{$user->id}.{$request->extension}",
             contentType: "image/{$request->extension}"
         );
+
         return response()->json($s3Data);
     }
+
     public function store(Request $request)
     {
         try {
@@ -72,6 +78,7 @@ class ProfileUserController
                 $user->phone = $request->phone;
             }
             $user->save();
+
             return successRes([
                 'id' => $user->id,
                 'avatar' => $user->avatar ?? null,

@@ -2,8 +2,8 @@
 
 namespace App\Features\Reviews\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use App\Features\Users\Models\User;
+use Illuminate\Database\Eloquent\Model;
 
 class Review extends Model
 {

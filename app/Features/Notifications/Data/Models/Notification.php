@@ -2,15 +2,16 @@
 
 namespace App\Features\Notifications\Data\Models;
 
+use App\Features\Users\Data\Models\User;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use Carbon\Carbon;
-use App\Features\Users\Data\Models\User;
 
 class Notification extends Model
 {
     use HasFactory;
+
     protected $fillable = [
         'user_id',
         'title',
@@ -33,16 +34,19 @@ class Notification extends Model
         'sender_id',
         'ip_address',
     ];
+
     protected $casts = [
         'data' => 'array',
         'is_read' => 'boolean',
         'read_at' => 'datetime',
     ];
+
     public function users()
     {
         return $this->belongsToMany(User::class, 'notification_user')
             ->withPivot('is_read', 'read_at', 'clicked_at');
     }
+
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -100,18 +104,21 @@ class Notification extends Model
         if ($targetValue) {
             $query->where('target_value', $targetValue);
         }
+
         return $query;
     }
+
     public function createdAt(): Attribute
     {
         return Attribute::make(
-            get: fn(mixed $value) => Carbon::parse($value)->format('Y-m-d H:i'),
+            get: fn (mixed $value) => Carbon::parse($value)->format('Y-m-d H:i'),
         );
     }
+
     public function updatedAt(): Attribute
     {
         return Attribute::make(
-            get: fn(mixed $value) => Carbon::parse($value)->format('Y-m-d H:i'),
+            get: fn (mixed $value) => Carbon::parse($value)->format('Y-m-d H:i'),
         );
     }
 }

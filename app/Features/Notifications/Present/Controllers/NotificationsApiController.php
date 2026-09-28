@@ -1,10 +1,12 @@
 <?php
 
 namespace App\Features\Notifications\Present\Controllers;
-use Illuminate\Http\Request;
-use App\Models\System\Notification;
+
 use App\Http\Resources\Dash\NotificationResource;
+use App\Models\System\Notification;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+
 class NotificationsApiController
 {
     protected function get(Request $request)
@@ -12,7 +14,7 @@ class NotificationsApiController
         try {
             $currentUser = Auth::guard('sanctum')->user();
             $query = Notification::query();
-            if (!$currentUser) {
+            if (! $currentUser) {
                 return failureRes(
                     'User not authenticated',
                     401
@@ -25,7 +27,7 @@ class NotificationsApiController
                         $subQuery->where('target_type', 'role')
                             ->whereIn('target_value', $currentUser->getRoleNames()->toArray());
                     })
-                    ->orWhere(function ($subQuery) use ($currentUser) {
+                    ->orWhere(function ($subQuery) {
                         $subQuery->where('target_type', 'topic')
                             ->whereIn('target_value', ['general', 'system_alerts', 'new_orders']);
                     });
@@ -33,13 +35,13 @@ class NotificationsApiController
             if ($request->has('read') && $request->get('read') !== null) {
                 $query->where('is_read', $request->get('read'));
             }
-            if ($request->has('type') && !empty($request->get('type'))) {
+            if ($request->has('type') && ! empty($request->get('type'))) {
                 $query->where('type', $request->get('type'));
             }
-            if ($request->has('priority') && !empty($request->get('priority'))) {
+            if ($request->has('priority') && ! empty($request->get('priority'))) {
                 $query->where('priority', $request->get('priority'));
             }
-            if ($request->has('query') && !empty($request->get('query'))) {
+            if ($request->has('query') && ! empty($request->get('query'))) {
                 $search = $request->get('query');
                 $query->where(function ($q) use ($search) {
                     $q->where('title', 'LIKE', "%{$search}%")
@@ -49,10 +51,11 @@ class NotificationsApiController
             }
             $notifications = $query->orderBy('created_at', 'desc')->take(30)->get();
             foreach ($request->query() as $key => $value) {
-                if (!empty($value)) {
+                if (! empty($value)) {
                     $notifications->appends([$key => $value]);
                 }
             }
+
             return successRes(NotificationResource::collection($notifications), 200);
         } catch (\Exception $e) {
             return failureRes(
@@ -60,17 +63,19 @@ class NotificationsApiController
             );
         }
     }
+
     protected function markAsRead(Request $request, $id)
     {
         try {
             $notification = Notification::find($id);
-            if (!$notification) {
+            if (! $notification) {
                 return failureRes(
                     'Notification not found',
                     404
                 );
             }
             $notification->markAsRead();
+
             return successRes(
                 'Notification marked as read'
             );
@@ -80,11 +85,12 @@ class NotificationsApiController
             );
         }
     }
+
     protected function markAllAsRead(Request $request)
     {
         try {
             $currentUser = auth()->user();
-            if (!$currentUser) {
+            if (! $currentUser) {
                 return failureRes(
                     'User not authenticated',
                     401
@@ -98,15 +104,16 @@ class NotificationsApiController
                         $subQuery->where('target_type', 'role')
                             ->whereIn('target_value', $currentUser->getRoleNames()->toArray());
                     })
-                    ->orWhere(function ($subQuery) use ($currentUser) {
+                    ->orWhere(function ($subQuery) {
                         $subQuery->where('target_type', 'topic')
                             ->whereIn('target_value', ['general', 'system_alerts', 'new_orders']);
                     });
             });
             $query->where('is_read', false)->update([
                 'is_read' => true,
-                'read_at' => now()
+                'read_at' => now(),
             ]);
+
             return successRes(
                 'All notifications marked as read'
             );
@@ -116,18 +123,20 @@ class NotificationsApiController
             );
         }
     }
+
     protected function delete(Request $request, $id)
     {
         try {
             $notification = Notification::find($id);
 
-            if (!$notification) {
+            if (! $notification) {
                 return failureRes(
                     'Notification not found',
                     404
                 );
             }
             $notification->delete();
+
             return successRes(
                 'Notification deleted successfully'
             );

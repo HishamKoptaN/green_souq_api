@@ -3,7 +3,6 @@
 namespace App\Features\Users\Domain\UseCases;
 
 use App\Features\Users\Data\Models\User;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 
 class RegisterUserUseCase
@@ -19,6 +18,7 @@ class RegisterUserUseCase
                 'latitude' => $data['latitude'] ?? null,
                 'longitude' => $data['longitude'] ?? null,
             ]);
+
             return $user;
         });
     }

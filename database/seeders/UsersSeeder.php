@@ -1,8 +1,10 @@
 <?php
 
 namespace Database\Seeders;
-use Illuminate\Database\Seeder;
+
 use App\Features\Users\Data\Models\User;
+use Illuminate\Database\Seeder;
+
 class UsersSeeder extends Seeder
 {
     public function run(): void

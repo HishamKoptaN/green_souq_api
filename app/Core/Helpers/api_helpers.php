@@ -1,4 +1,5 @@
 <?php
+
 function successRes($data = null, $code = 200)
 {
     return response()->json(
@@ -27,9 +28,10 @@ function validationErrorRes($errors, $message = 'البيانات المدخلة
     if (is_array($errors)) {
         $errors = implode(', ', array_flatten($errors));
     }
+
     return response()->json(
         [
-            "message" => $message,
+            'message' => $message,
             'error' => $errors,
         ],
         $status,

@@ -2,7 +2,6 @@
 
 namespace App\Features\Notifications\Present\Resources;
 
-use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class NotificationResource extends JsonResource

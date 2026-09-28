@@ -1,30 +1,33 @@
 <?php
+
 namespace App\Features\Users\Present\Http\Controllers;
-use App\Features\Users\Domain\UseCases\RegisterUserUseCase;
-use Illuminate\Http\Request;
+
 use App\Events\Users\UserRegistered;
 use App\Features\Firebase\Domain\UseCases\FirebaseUseCases;
-use Illuminate\Support\Facades\Auth;
+use App\Features\Users\Data\Models\User;
+use App\Features\Users\Domain\UseCases\RegisterUserUseCase;
 use Exception;
 use Illuminate\Http\JsonResponse;
-use App\Features\Users\Data\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
 class AuthController
 {
-    public function __construct(private FirebaseUseCases $firebaseUseCases)
-    {
-    }
+    public function __construct(private FirebaseUseCases $firebaseUseCases) {}
+
     public function check()
     {
         try {
             $user = Auth::guard('sanctum')->user();
-            if (!$user) {
+            if (! $user) {
                 return failureRes(null, 401, 'غير مصرح بالدخول');
             }
+
             return successRes(
                 $user,
                 200,
             );
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return failureRes($e->getMessage(), 500, 'حدث خطأ أثناء التحقق من المصادقة');
         }
     }
@@ -37,11 +40,13 @@ class AuthController
                 ['firebase_uid' => $firebaseUid],
                 []
             );
+
             return successRes([
-                'token' => $user->createToken("auth", ['*'], now()->addWeek())->plainTextToken,
+                'token' => $user->createToken('auth', ['*'], now()->addWeek())->plainTextToken,
             ]);
         } catch (\Throwable $e) {
             $status = ($e instanceof InvalidToken) ? 401 : 500;
+
             return failureRes(
                 'فشلت عملية تسجيل الدخول',
                 $status,
@@ -50,6 +55,7 @@ class AuthController
             );
         }
     }
+
     public function signUp(Request $request, RegisterUserUseCase $registerUserUseCase)
     {
         $request->validate([
@@ -71,12 +77,14 @@ class AuthController
                 'image' => $request->image,
             ]
         );
+
         // event(new UserRegistered($user));
         return response()->json([
             'message' => 'تم تسجيل المستخدم بنجاح',
-            'user' => $user
+            'user' => $user,
         ], 201);
     }
+
     public function logout(Request $request): JsonResponse
     {
         try {
@@ -84,16 +92,18 @@ class AuthController
             if ($user) {
                 $user->tokens()->delete();
                 Auth::logout();
+
                 return successRes(
                     null,
                     200,
                 );
             }
+
             return failureRes(
                 'غير مصرح لك بالخروج',
                 401
             );
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return failureRes('حدث خطأ أثناء تسجيل الخروج', 500);
         }
     }

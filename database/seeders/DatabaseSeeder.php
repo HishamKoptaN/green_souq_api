@@ -2,15 +2,18 @@
 
 namespace Database\Seeders;
 
-use App\Features\Users\Data\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
     use WithoutModelEvents;
+
     public function run(): void
     {
-        $this->call(UsersSeeder::class);
+        $this->call([
+            UsersSeeder::class,
+            PostsSeeder::class,
+        ]);
     }
 }

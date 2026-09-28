@@ -2,9 +2,8 @@
 
 namespace App\Features\S3;
 
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Aws\S3\S3Client;
+use Illuminate\Support\Facades\Storage;
 
 class S3Service
 {
@@ -17,23 +16,24 @@ class S3Service
         } else {
             $client = new S3Client([
                 'version' => 'latest',
-                'region'  => config('filesystems.disks.s3.region'),
+                'region' => config('filesystems.disks.s3.region'),
                 'credentials' => [
-                    'key'    => config('filesystems.disks.s3.key'),
+                    'key' => config('filesystems.disks.s3.key'),
                     'secret' => config('filesystems.disks.s3.secret'),
-                    'ACL'    => 'public-read',
+                    'ACL' => 'public-read',
                 ],
             ]);
         }
         $command = $client->getCommand('PutObject', [
             'Bucket' => config('filesystems.disks.s3.bucket'),
-            'Key'    => $path,
+            'Key' => $path,
             'ContentType' => $contentType,
         ]);
+
         return [
             'upload_url' => (string) $client->createPresignedRequest($command, '+10 minutes')->getUri(),
-            'file_path'  => $path,
-            'content_type' => $contentType
+            'file_path' => $path,
+            'content_type' => $contentType,
         ];
     }
 }

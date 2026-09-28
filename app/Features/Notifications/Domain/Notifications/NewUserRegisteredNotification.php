@@ -2,23 +2,25 @@
 
 namespace App\Features\Notifications\Domain\Notifications;
 
-use Illuminate\Bus\Queueable;
-use Kreait\Firebase\Messaging\CloudMessage;
-use Illuminate\Notifications\Notification;
 use App\Features\Users\Data\Models\User;
+use Illuminate\Bus\Queueable;
+use Illuminate\Notifications\Notification;
+use Kreait\Firebase\Messaging\CloudMessage;
 
 class NewUserRegisteredNotification extends Notification
 {
     use Queueable;
+
     public function __construct(
         protected User $user,
         protected int $notificationId,
-    ) {
-    }
+    ) {}
+
     public function via($notifiable)
     {
         return ['firebase', 'database'];
     }
+
     public function toFirebase()
     {
         return CloudMessage::new()
@@ -38,6 +40,7 @@ class NewUserRegisteredNotification extends Notification
                 ],
             );
     }
+
     public function toDatabase($notifiable)
     {
         return [
@@ -47,6 +50,7 @@ class NewUserRegisteredNotification extends Notification
             'user_id' => (string) $this->user->id,
         ];
     }
+
     public function toArray($notifiable)
     {
         return [];

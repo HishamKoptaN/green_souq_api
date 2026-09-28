@@ -9,7 +9,7 @@ class RegisterUserUseCaseTest extends TestCase
 {
     public function test_can_instantiate_register_user_use_case(): void
     {
-        $useCase = new RegisterUserUseCase();
+        $useCase = new RegisterUserUseCase;
         $this->assertInstanceOf(RegisterUserUseCase::class, $useCase);
     }
 }

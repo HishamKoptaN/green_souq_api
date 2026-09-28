@@ -2,8 +2,8 @@
 
 namespace App\Features\Reviews\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Features\Reviews\Models\Review;
+use Illuminate\Http\Request;
 
 class ReviewController
 {
@@ -12,16 +12,16 @@ class ReviewController
         $request->validate([
             'reviewee_id' => 'required|exists:users,id',
             'rating' => 'required|integer|min:1|max:5',
-            'comment' => 'nullable|string'
+            'comment' => 'nullable|string',
         ]);
         Review::updateOrCreate(
             [
                 'reviewer_id' => auth()->id(),
-                'reviewee_id' => $request->reviewee_id
+                'reviewee_id' => $request->reviewee_id,
             ],
             [
                 'rating' => $request->rating,
-                'comment' => $request->comment
+                'comment' => $request->comment,
             ]
         );
 

@@ -1,6 +1,6 @@
 <?php
 
-if (!function_exists('paginateRes')) {
+if (! function_exists('paginateRes')) {
     function paginateRes(
         $paginator,
         $resource,

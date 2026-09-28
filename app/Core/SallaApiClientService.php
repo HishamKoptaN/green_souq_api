@@ -3,49 +3,58 @@
 namespace App\Core;
 
 use App\Features\SallaTokenManager\SallaTokenManagerService;
+use Exception;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Exception;
 
 class SallaApiClientService
 {
     protected $sallaTokenManagerService;
+
     private string $baseUrl;
+
     public function __construct(SallaTokenManagerService $sallaTokenManagerService)
     {
         $this->sallaTokenManagerService = $sallaTokenManagerService;
         $env = config('salla.environment', 'production');
         $this->baseUrl = config("salla.base_url.{$env}.api", 'https://api.salla.sa/admin/v2');
     }
+
     public function get(string $endpoint, array $query = []): array
     {
         return $this->request('GET', $endpoint, $query);
     }
+
     public function post(string $endpoint, array $data = []): array
     {
         return $this->request('POST', $endpoint, $data);
     }
+
     public function patch(string $endpoint, array $data = []): array
     {
         return $this->request('PATCH', $endpoint, $data);
     }
+
     public function put(string $endpoint, array $data = []): array
     {
         return $this->request('PUT', $endpoint, $data);
     }
+
     public function delete(string $endpoint): array
     {
         return $this->request('DELETE', $endpoint);
     }
+
     private function request(string $method, string $endpoint, array $data = []): array
     {
-        $url = rtrim($this->baseUrl, '/') . '/' . ltrim($endpoint, '/');
+        $url = rtrim($this->baseUrl, '/').'/'.ltrim($endpoint, '/');
         try {
             $response = $this->sendHttpRequest($method, $url, $data);
-            if (!$response || !$response->successful()) {
+            if (! $response || ! $response->successful()) {
                 $status = $response?->status() ?? 'N/A';
                 throw new Exception("Salla API unavailable (HTTP {$status})");
             }
+
             return $response->json();
         } catch (Exception $e) {
             return [
@@ -54,22 +63,25 @@ class SallaApiClientService
             ];
         }
     }
+
     private function sendHttpRequest(string $method, string $url, array $data = [])
     {
         $token = $this->sallaTokenManagerService->getValidToken();
-        if (!$token) {
-            Log::info("No valid Salla access token, attempting refresh...");
+        if (! $token) {
+            Log::info('No valid Salla access token, attempting refresh...');
             if ($this->sallaTokenManagerService->refreshToken(true)) {
-                Log::info("Token refreshed successfully");
+                Log::info('Token refreshed successfully');
                 $token = $this->sallaTokenManagerService->getValidToken();
             }
 
-            if (!$token) {
+            if (! $token) {
                 throw new Exception('انتهت صلاحية التوكن وفشل في تجديده. أعد التفويض مع سلة.');
             }
         }
+
         return $this->makeRequestWithRetry($method, $url, $data, $token);
     }
+
     private function makeRequestWithRetry(string $method, string $url, array $data, string $token)
     {
         $retries = config('salla.retry.attempts', 3);
@@ -102,8 +114,9 @@ class SallaApiClientService
                     'body' => $response?->body(),
                 ]);
             } catch (Exception $e) {
-                if ($i === $retries)
+                if ($i === $retries) {
                     throw $e;
+                }
                 sleep($delay * $i);
             }
         }
