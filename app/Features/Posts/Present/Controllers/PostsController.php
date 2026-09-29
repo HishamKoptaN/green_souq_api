@@ -2,8 +2,13 @@
 
 namespace App\Features\Posts\Present\Controllers;
 
+use App\Features\Posts\Actions\CreatePostAction;
+use App\Features\Posts\Data\Models\Post;
+use App\Features\Posts\DTOs\CreatePostDTO;
 use App\Features\Posts\Present\Resources\PostResource;
+use App\Features\Posts\Requests\StorePostRequest;
 use App\Features\Users\Data\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -11,21 +16,9 @@ class PostsController
 {
     public function index(Request $request)
     {
-        $user = Auth::guard('sanctum')->user();
-        if (! $user) {
-            return failureRes(null, 401, 'غير مصرح بالدخول');
-        }
-        $query = $request->input('query');
-        $shops = User::whereIn('user_type', ['farmer', 'shop'])->with([
-            'receivedRatings' => function ($q) use ($user) {
-                $q->where('evaluator_id', $user->id);
-            },
-        ]);
-        if ($query) {
-            $shops->where('name', 'like', "%{$query}%");
-        }
+        $posts = Post::with(['owner', 'postable'])->paginate(3);
 
-        return paginateRes($shops->paginate(3), PostResource::class);
+        return paginateRes($posts, PostResource::class);
     }
 
     public function show(User $user)
@@ -40,5 +33,20 @@ class PostsController
         }
 
         return new PostResource($user);
+    }
+
+    public function store(StorePostRequest $request, CreatePostAction $action): JsonResponse
+    {
+        return response()->json(
+            new PostResource(
+                $action->execute(
+                    CreatePostDTO::fromRequest(
+                        $request->validated(),
+                        Auth::guard('sanctum')->user()->id,
+                    ),
+                ),
+            ),
+            201,
+        );
     }
 }

@@ -9,11 +9,15 @@ return new class extends Migration
     public function up()
     {
         Schema::create(
-            'shared_posts',
+            'occasions',
             function (Blueprint $table) {
                 $table->id();
-                $table->text('content')->nullable();
-                $table->foreignId('post_id')->constrained('posts')->cascadeOnDelete();
+                $table->string('image')->nullable();
+                $table->string('title')->nullable();
+                $table->text('description')->nullable();
+                $table->text('link')->nullable();
+                $table->timestamp('start_at')->nullable();
+                $table->timestamp('end_at')->nullable();
                 $table->timestamps();
             },
         );
@@ -22,7 +26,7 @@ return new class extends Migration
     public function down()
     {
         Schema::dropIfExists(
-            'shared_posts',
+            'occasions',
         );
     }
 };

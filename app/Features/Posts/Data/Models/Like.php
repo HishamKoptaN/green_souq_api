@@ -2,7 +2,7 @@
 
 namespace App\Models\Social\Post;
 
-use App\Models\User\User;
+use App\Features\Users\Data\Models\User;
 use Database\Factories\LikeFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

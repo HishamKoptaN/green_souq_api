@@ -2,22 +2,18 @@
 
 namespace App\Features\Profile\Present\Controllers;
 
+use App\Core\Contracts\DirectUploadSignerInterface;
 use App\Features\Firebase\Domain\UseCases\FirebaseUseCases;
-use App\Features\Storage\Services\S3Service;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class ProfileUserController
 {
-    private $s3Service;
-
     private $firebaseUseCases;
 
     public function __construct(
-        S3Service $s3Service,
         FirebaseUseCases $firebaseUseCases
     ) {
-        $this->s3Service = $s3Service;
         $this->firebaseUseCases = $firebaseUseCases;
     }
 
@@ -31,7 +27,7 @@ class ProfileUserController
                 'name' => $user->name,
                 'email' => $user->email,
                 'phone' => $user->phone,
-                'role' => $user->getRoleNames()->first(),
+                // 'role' => $user->getRoleNames()->first(),
                 'created_at' => $user->created_at->format('Y-m-d H:i:s'),
             ];
 
@@ -41,22 +37,17 @@ class ProfileUserController
         }
     }
 
-    public function presigned(Request $request)
+    public function presigned(Request $request, DirectUploadSignerInterface $signer)
     {
-        $user = Auth::guard('sanctum')->user();
-        if (! $user) {
-            return response()->json([
-                'status' => false,
-                'message' => 'User not authenticated',
-            ], 401);
-        }
-        $request->validate(['extension' => 'required|string|max:5']);
-        $s3Data = $this->s3Service->signUpload(
-            path: "users/profiles/avatar/{$user->id}.{$request->extension}",
-            contentType: "image/{$request->extension}"
+        return response()->json(
+            $signer->generateSignature(
+                'users/profiles/avatar',
+                options: [
+                    'public_id' => (string) Auth::guard('sanctum')->user()->id,
+                    'overwrite' => true,
+                ]
+            ),
         );
-
-        return response()->json($s3Data);
     }
 
     public function store(Request $request)
@@ -66,7 +57,7 @@ class ProfileUserController
             $request->validate([
                 'avatar' => 'sometimes|string|max:255',
                 'name' => 'sometimes|string|max:255',
-                'phone' => 'sometimes|string|max:255',
+                'phone' => 'sometimes||max:255',
             ]);
             if ($request->has('avatar')) {
                 $user->avatar = $request->avatar;
@@ -85,7 +76,7 @@ class ProfileUserController
                 'name' => $user->name,
                 'phone' => $user->phone,
                 'created_at' => $user->created_at->format('Y-m-d H:i:s'),
-                'role' => $user->getRoleNames()->first(),
+                // 'role' => $user->getRoleNames()->first(),
             ]);
         } catch (\ValidationException $e) {
             return failureRes($e->errors());

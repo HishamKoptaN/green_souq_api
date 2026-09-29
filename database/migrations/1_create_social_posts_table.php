@@ -13,9 +13,6 @@ return new class extends Migration
             function (Blueprint $table) {
                 $table->id();
                 $table->text('content')->nullable();
-                $table->text('image')->nullable();
-                $table->text('video')->nullable();
-                $table->text('pdf')->nullable();
                 $table->timestamps();
             },
         );

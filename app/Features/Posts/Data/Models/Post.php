@@ -2,9 +2,9 @@
 
 namespace App\Features\Posts\Data\Models;
 
+use App\Features\Users\Data\Models\User;
 use App\Models\Global\Hide;
 use App\Models\Global\Report;
-use App\Models\User\User;
 use Carbon\Carbon;
 use Database\Factories\social\post\PostFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -16,12 +16,8 @@ class Post extends Model
 
     protected $fillable = [
         'user_id',
-        'parent_id',
-        'type',
-        'content',
         'postable_type',
         'postable_id',
-        'publish_at',
         'created_at',
     ];
 
@@ -29,7 +25,10 @@ class Post extends Model
         'postable',
     ];
 
-    protected $dates = ['publish_at'];
+    public function owner()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 
     public function parent()
     {

@@ -3,10 +3,11 @@
 namespace Database\Seeders;
 
 use App\Features\Posts\Data\Models\Post;
+use App\Features\Posts\Data\Models\SocialPost;
 use App\Features\Users\Data\Models\User;
 use Illuminate\Database\Seeder;
 
-class PostsSeeder extends Seeder
+class SocialPostsSeeder extends Seeder
 {
     public function run(): void
     {
@@ -32,23 +33,26 @@ class PostsSeeder extends Seeder
             ['id' => 19, 'type' => 'company', 'content' => 'ابتكارات جديدة في عالم المكافحة الحيوية تقدمها شركة المستقبل الزراعي.'],
             ['id' => 20, 'type' => 'farmer', 'content' => 'تجربتي الشخصية كمزارع في استخدام الأسمدة العضوية لتحسين خصوبة التربة.'],
         ];
-
         foreach ($postsData as $data) {
             $postType = $data['type'];
             $user = User::where('user_type', $postType)->inRandomOrder()->first();
-
-            if (!$user) {
-                $user = User::first();
-            }
-
             if ($user) {
-                Post::updateOrCreate(
-                    ['id' => $data['id']],
+                $socialPost = SocialPost::updateOrCreate(
                     [
-                        'user_id' => $user->id,
-                        'type' => 'original',
+                        'id' => $data['id'],
+                    ],
+                    [
                         'content' => $data['content'],
                     ]
+                );
+                Post::updateOrCreate(
+                    [
+                        'id' => $data['id'],
+                        'user_id' => $user->id,
+                        'postable_type' => 'social',
+                        'postable_id' => $socialPost->id,
+                    ],
+                    []
                 );
             }
         }
