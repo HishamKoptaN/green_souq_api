@@ -2,10 +2,11 @@
 
 namespace App\Features\Profile\Present\Controllers;
 
-use App\Core\Contracts\DirectUploadSignerInterface;
 use App\Features\Firebase\Domain\UseCases\FirebaseUseCases;
+use App\Features\Storage\Data\Contracts\DirectUploadSignerInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class ProfileUserController
 {
@@ -21,17 +22,11 @@ class ProfileUserController
     {
         try {
             $user = Auth::guard('sanctum')->user();
-            $profileData = [
-                'id' => $user->id,
-                'avatar' => $user->avatar ?? null,
-                'name' => $user->name,
-                'email' => $user->email,
-                'phone' => $user->phone,
-                // 'role' => $user->getRoleNames()->first(),
-                'created_at' => $user->created_at->format('Y-m-d H:i:s'),
-            ];
+            $userData = $user->toArray();
+            $userData['average_rating'] = $user->averageRating();
+            $userData['ratings_count'] = $user->received_ratings_count;
 
-            return successRes($profileData);
+            return successRes($userData);
         } catch (\Exception $e) {
             return failureRes($e->getMessage());
         }
@@ -39,12 +34,16 @@ class ProfileUserController
 
     public function presigned(Request $request, DirectUploadSignerInterface $signer)
     {
+        $request->validate([
+            'extension' => 'required|string|max:10',
+        ]);
+
         return response()->json(
             $signer->generateSignature(
                 'users/profiles/avatar',
                 options: [
-                    'public_id' => (string) Auth::guard('sanctum')->user()->id,
-                    'overwrite' => true,
+                    'public_id' => Auth::guard('sanctum')->user()->id.'_'.time(),
+                    'extension' => $request->input('extension'),
                 ]
             ),
         );
@@ -54,34 +53,32 @@ class ProfileUserController
     {
         try {
             $user = Auth::guard('sanctum')->user();
-            $request->validate([
-                'avatar' => 'sometimes|string|max:255',
-                'name' => 'sometimes|string|max:255',
-                'phone' => 'sometimes||max:255',
-            ]);
-            if ($request->has('avatar')) {
-                $user->avatar = $request->avatar;
+            if ($request->exists('avatar')) {
+                $newAvatar = $request->input('avatar');
+                if ($user->avatar && ($newAvatar === null || $newAvatar !== $user->avatar)) {
+                    $this->deleteOldAvatarFile($user->avatar);
+                }
+                $user->avatar = $newAvatar;
             }
-            if ($request->has('name')) {
-                $user->name = $request->name;
-            }
-            if ($request->has('phone')) {
-                $user->phone = $request->phone;
-            }
-            $user->save();
+            $user = tap($user)->update($request->all());
 
-            return successRes([
-                'id' => $user->id,
-                'avatar' => $user->avatar ?? null,
-                'name' => $user->name,
-                'phone' => $user->phone,
-                'created_at' => $user->created_at->format('Y-m-d H:i:s'),
-                // 'role' => $user->getRoleNames()->first(),
-            ]);
+            return successRes($user);
         } catch (\ValidationException $e) {
             return failureRes($e->errors());
         } catch (\Exception $e) {
             return failureRes($e->getMessage());
+        }
+    }
+
+    private function deleteOldAvatarFile(?string $avatarUrl): void
+    {
+        if (! $avatarUrl) {
+            return;
+        }
+        $path = parse_url($avatarUrl, PHP_URL_PATH) ?? $avatarUrl;
+        $relativeOldPath = ltrim(str_replace('/storage/', '', $path), '/');
+        if (Storage::disk('public')->exists($relativeOldPath)) {
+            Storage::disk('public')->delete($relativeOldPath);
         }
     }
 }

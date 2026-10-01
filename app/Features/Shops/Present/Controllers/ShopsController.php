@@ -25,7 +25,7 @@ class ShopsController
             $shops->where('name', 'like', "%{$query}%");
         }
 
-        return paginateRes($shops->paginate(3), ShopResource::class);
+        return paginateRes($shops->paginate(5), ShopResource::class);
     }
 
     public function show(User $user)

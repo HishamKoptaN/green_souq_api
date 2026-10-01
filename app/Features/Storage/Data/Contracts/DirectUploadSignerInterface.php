@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Core\Contracts;
+namespace App\Features\Storage\Data\Contracts;
 
 interface DirectUploadSignerInterface
 {

@@ -20,4 +20,27 @@ class SocialPost extends Model
             'postable',
         );
     }
+
+    public function likes()
+    {
+        return $this->morphMany(Like::class, 'likeable');
+    }
+
+    public function comments()
+    {
+        return $this->morphMany(Comment::class, 'commentable')->latest();
+    }
+
+    public function isLikedBy(?User $user = null): bool
+    {
+        $user = $user ?? auth('sanctum')->user();
+        if (! $user) {
+            return false;
+        }
+        if ($this->relationLoaded('likes')) {
+            return $this->likes->contains('user_id', $user->id);
+        }
+
+        return $this->likes()->where('user_id', $user->id)->exists();
+    }
 }

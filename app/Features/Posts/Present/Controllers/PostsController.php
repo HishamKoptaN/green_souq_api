@@ -16,9 +16,20 @@ class PostsController
 {
     public function index(Request $request)
     {
-        $posts = Post::with(['owner', 'postable'])->paginate(3);
+        $user = Auth::guard('sanctum')->user();
+        $query = Post::with(['author', 'postable'])->latest();
+        if ($request->has('user_id')) {
+            $targetUserId = $request->query('user_id');
+            if ((int) $targetUserId === $user->id) {
+                $query->where('user_id', $user->id);
+            } else {
+                $query->where('user_id', $targetUserId);
+            }
+        } elseif ($request->query('type') === 'me') {
+            $query->where('user_id', $user->id);
+        }
 
-        return paginateRes($posts, PostResource::class);
+        return paginateRes($query->paginate(5), PostResource::class);
     }
 
     public function show(User $user)

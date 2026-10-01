@@ -3,7 +3,6 @@
 namespace App\Features\Posts\Present\Resources;
 
 use App\Features\Posts\Data\Models\SocialPost;
-use App\Models\User\Company;
 use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
@@ -16,18 +15,13 @@ class PostResource extends JsonResource
         $postArray = [
             'id' => $this->id,
             'type' => $this->postable_type,
-            'owner' => $this->owner,
-            // 'likes_count' => $this->likes()->count(),
-            // 'is_like' => $this->isLikedByUser(),
-            // 'shares_count' => $this->shares()->count(),
+            'author' => $this->author,
             'postable' => new PostableResource(
                 $this->whenLoaded(
                     'postable',
                 ),
             ),
-            // 'cmnts_count' => Comment::where('commentable_id', $this->id)
-            // ->where('commentable_type', Post::class)
-            // ->count(),
+
             // 'cmnters_images' => Comment::where('commentable_id', $this->id)
             // ->where('commentable_type', Post::class)
             // ->with('user.userable')
@@ -45,11 +39,7 @@ class PostResource extends JsonResource
             // ->pluck('image')
             // ->filter()
             // ->values(),
-            // 'created_at' => $this->created_at->diffForHumans(),
-            // 'publish_at' => $this->publish_at->diffInDays(now()) > 7
-            // ? $this->publish_at->format('d-m-Y')
-            // : $this->publish_at->diffForHumans(),
-
+            'created_at' => $this->created_at,
         ];
 
         return $postArray;
@@ -96,7 +86,7 @@ class SharedPostResource extends JsonResource
         $postArray = [
             'id' => $this->id,
             'type' => $this->type,
-            'post_owner' => $this->getPostOwnerDetails($this->user),
+            'author' => $this->getAuthorDetails($this->user),
             'shared_post' => new PostResource(
                 $sharedPost,
             ),
@@ -107,7 +97,7 @@ class SharedPostResource extends JsonResource
         return $postArray;
     }
 
-    private function getPostOwnerDetails($user)
+    private function getAuthorDetails($user)
     {
         $authUser = Auth::guard('sanctum')->user();
 
@@ -120,16 +110,16 @@ class SharedPostResource extends JsonResource
                 'is_following' => false,
             ];
         }
-        $owner = $user->userable;
+        $author = $user->userable;
         $isFollowing = $authUser && $authUser->id !== $user->id
             ? $authUser->following()->where('followed_id', $user->id)->exists()
             : null;
 
         return [
-            'id' => $owner->id,
-            'type' => $owner->getMorphClass(),
-            'name' => $owner instanceof Company ? $owner->name : "{$owner->first_name} {$owner->last_name}",
-            'image' => $owner->image,
+            'id' => $author->id,
+            'type' => $author->getMorphClass(),
+            'name' => $author->name,
+            'image' => $author->image,
             'is_following' => $isFollowing,
         ];
     }
@@ -141,6 +131,10 @@ class CustomPostResource extends JsonResource
         return [
             'id' => $this->id,
             'content' => $this->content,
+            'is_like' => $this->isLikedBy(),
+            'likes_count' => $this->likes_count,
+            'comments_count' => $this->comments_count,
+            // 'shares_count' => $this->shares()->count(),
         ];
     }
 }

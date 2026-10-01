@@ -13,6 +13,9 @@ return new class extends Migration
             function (Blueprint $table) {
                 $table->id();
                 $table->text('content')->nullable();
+                $table->unsignedBigInteger('likes_count')->default(0)->after('content');
+                $table->unsignedBigInteger('comments_count')->default(0)->after('likes_count');
+                $table->unsignedBigInteger('shares_count')->default(0)->after('comments_count');
                 $table->timestamps();
             },
         );

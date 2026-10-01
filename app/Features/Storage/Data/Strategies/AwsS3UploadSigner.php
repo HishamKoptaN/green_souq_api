@@ -1,13 +1,14 @@
 <?php
 
-namespace App\Features\S3;
+namespace App\Features\Storage\Data\strategies;
 
+use App\Features\Storage\Data\Contracts\DirectUploadSignerInterface;
 use Aws\S3\S3Client;
 use Illuminate\Support\Facades\Storage;
 
-class S3Service
+class AwsS3UploadSigner implements DirectUploadSignerInterface
 {
-    public function signUpload($path, $contentType)
+    public function generateSignature(string $folder = 'uploads', array $options = []): array
     {
         $disk = Storage::disk('s3');
         $adapter = $disk->getAdapter();
@@ -26,14 +27,14 @@ class S3Service
         }
         $command = $client->getCommand('PutObject', [
             'Bucket' => config('filesystems.disks.s3.bucket'),
-            'Key' => $path,
-            'ContentType' => $contentType,
+            // 'Key' => $path,
+            // 'ContentType' => $contentType,
         ]);
 
         return [
             'upload_url' => (string) $client->createPresignedRequest($command, '+10 minutes')->getUri(),
-            'file_path' => $path,
-            'content_type' => $contentType,
+            //  'file_path' => $path,
+            //  'content_type' => $contentType,
         ];
     }
 }

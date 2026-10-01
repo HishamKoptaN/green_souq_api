@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\Social\Post;
+namespace App\Features\Posts\Data\Models;
 
 use App\Features\Users\Data\Models\User;
 use Database\Factories\LikeFactory;
@@ -15,6 +15,9 @@ class Like extends Model
         'user_id',
         'likeable_id',
         'likeable_type',
+        'likes_count',
+        'comments_count',
+        'shares_count',
     ];
 
     public function likeable()

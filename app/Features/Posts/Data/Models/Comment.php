@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\Social\Post;
+namespace App\Features\Posts\Data\Models;
 
 use App\Features\Users\Data\Models\User;
 use Database\Factories\social\post\CommentFactory;

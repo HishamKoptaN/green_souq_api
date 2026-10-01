@@ -25,7 +25,7 @@ class Post extends Model
         'postable',
     ];
 
-    public function owner()
+    public function author()
     {
         return $this->belongsTo(User::class, 'user_id');
     }
@@ -50,13 +50,11 @@ class Post extends Model
         return $this->morphMany(Hide::class, 'hideable');
     }
 
-    // أو يمكنك استخدام accessor إذا كنت ترغب في إجراء بعض المعالجة الإضافية:
     public function getPublishAtAttribute($value)
     {
         return Carbon::parse($value);
     }
 
-    // ! Relations
     public function postable()
     {
         return $this->morphTo();
