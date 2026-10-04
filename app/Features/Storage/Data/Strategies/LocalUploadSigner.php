@@ -10,7 +10,7 @@ class LocalUploadSigner implements DirectUploadSignerInterface
     {
         return [
             'provider' => 'local',
-            'file_path' => rtrim(ltrim($folder, '/'), '/') . '/' . $options['public_id'] . '.' . ltrim(
+            'file_path' => rtrim(ltrim($folder, '/'), '/').'/'.$options['public_id'].'.'.ltrim(
                 $options['extension'],
                 '.',
             ),
