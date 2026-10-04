@@ -9,11 +9,14 @@ return new class extends Migration
     public function up()
     {
         Schema::create(
-            'likes',
+            'support_tickets',
             function (Blueprint $table) {
                 $table->id();
-                $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-                $table->morphs('likeable');
+                $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+                $table->string('subject');
+                $table->string('type');
+                $table->text('description');
+                $table->enum('status', ['open', 'closed'])->default('open');
                 $table->timestamps();
             },
         );
@@ -21,6 +24,6 @@ return new class extends Migration
 
     public function down()
     {
-        Schema::dropIfExists('likes');
+        Schema::dropIfExists('comments');
     }
 };

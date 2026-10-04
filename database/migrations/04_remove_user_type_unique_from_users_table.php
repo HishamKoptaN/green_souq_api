@@ -12,11 +12,9 @@ return new class extends Migration
             try {
                 $table->dropUnique('users_user_type_unique');
             } catch (Throwable $e) {
-                // In case the index name is different or doesn't exist
                 try {
                     $table->dropUnique(['user_type']);
                 } catch (Throwable $ex) {
-                    // Ignore if already dropped or doesn't exist
                 }
             }
         });

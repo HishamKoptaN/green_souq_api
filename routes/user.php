@@ -9,6 +9,7 @@ use App\Features\Ratings\Present\Controllers\RatingsController;
 use App\Features\SalesEngineers\Present\Controllers\SalesEngineersController;
 use App\Features\Shops\Present\Controllers\ShopsController;
 use App\Features\Storage\Present\Controllers\DirectUploadController;
+use App\Features\SupportTickets\Present\Controllers\SupportTicketsController;
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('/posts', PostsController::class);
@@ -33,6 +34,7 @@ Route::middleware('auth:sanctum')->group(function () {
         'ratings',
         RatingsController::class,
     );
+    Route::apiResource('/support-tickets', SupportTicketsController::class);
 
     Route::get('/notifications', [NotificationsApiController::class, 'get']);
     Route::apiResource('/profile', ProfileUserController::class);

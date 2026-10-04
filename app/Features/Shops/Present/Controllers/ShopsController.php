@@ -28,17 +28,16 @@ class ShopsController
         return paginateRes($shops->paginate(5), ShopResource::class);
     }
 
-    public function show(User $user)
+    public function show($id)
     {
-        $authEvaluator = Auth::guard('sanctum')->user();
-        if ($authEvaluator) {
-            $user->load([
-                'receivedRatings' => function ($q) use ($authEvaluator) {
-                    $q->where('evaluator_id', $authEvaluator->id);
-                },
-            ]);
-        }
+        $user = User::with([
+            'receivedRatings' => function ($q) use ($id) {
+                $q->where('evaluator_id', $id);
+            },
+        ])->find($id);
 
-        return new ShopResource($user);
+        return successRes(
+            new ShopResource($user),
+        );
     }
 }

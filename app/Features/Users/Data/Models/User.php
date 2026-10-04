@@ -68,6 +68,6 @@ class User extends Authenticatable
 
     public function receivedRatings()
     {
-        return $this->hasMany(Rating::class, 'evaluated_id');
+        return $this->morphMany(Rating::class, 'rateable');
     }
 }

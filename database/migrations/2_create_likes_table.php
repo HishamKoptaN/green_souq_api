@@ -8,15 +8,17 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::create(
-            'likes',
-            function (Blueprint $table) {
-                $table->id();
-                $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-                $table->morphs('likeable');
-                $table->timestamps();
-            },
-        );
+        if (! Schema::hasTable('likes')) {
+            Schema::create(
+                'likes',
+                function (Blueprint $table) {
+                    $table->id();
+                    $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+                    $table->morphs('likeable');
+                    $table->timestamps();
+                },
+            );
+        }
     }
 
     public function down()

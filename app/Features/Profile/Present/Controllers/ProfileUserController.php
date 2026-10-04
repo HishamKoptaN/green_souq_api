@@ -42,7 +42,7 @@ class ProfileUserController
             $signer->generateSignature(
                 'users/profiles/avatar',
                 options: [
-                    'public_id' => Auth::guard('sanctum')->user()->id.'_'.time(),
+                    'public_id' => Auth::guard('sanctum')->user()->id . '_' . time(),
                     'extension' => $request->input('extension'),
                 ]
             ),
@@ -72,7 +72,7 @@ class ProfileUserController
 
     private function deleteOldAvatarFile(?string $avatarUrl): void
     {
-        if (! $avatarUrl) {
+        if (!$avatarUrl) {
             return;
         }
         $path = parse_url($avatarUrl, PHP_URL_PATH) ?? $avatarUrl;

@@ -13,13 +13,11 @@ return new class extends Migration
             $table->foreignId('evaluator_id')
                 ->constrained('users')
                 ->cascadeOnDelete();
-            $table->foreignId('evaluated_id')
-                ->constrained('users')
-                ->cascadeOnDelete();
+            $table->morphs('rateable');
             $table->unsignedTinyInteger('rating');
             $table->text('comment')->nullable();
             $table->timestamps();
-            $table->unique(['evaluator_id', 'evaluated_id'], 'unique_user_rating_pair');
+            $table->unique(['evaluator_id', 'rateable_type', 'rateable_id'], 'unique_evaluator_rateable_pair');
         });
     }
 

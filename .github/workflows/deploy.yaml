@@ -1,0 +1,33 @@
+name: Continuous Deployment
+on:
+  push:
+    branches:
+      - dev
+      - prod
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ github.ref_name }}
+    steps:
+      - uses: appleboy/ssh-action@master
+        with:
+          host: ${{ vars.SSH_HOST }}
+          username: ${{ vars.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ vars.SSH_PORT }}
+          script: |
+            set -e
+            cd ${{ vars.PROJECT_PATH }}
+            git checkout .
+            git fetch origin ${{ github.ref_name }}
+            git reset --hard origin/${{ github.ref_name }}
+            cp .env.${{ github.ref_name }} .env 
+            php artisan down --retry=60
+            php artisan migrate --force
+            composer dump-autoload --optimize --no-scripts
+            php artisan optimize:clear
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
+            php artisan db:seed --class="DatabaseSeeder" --force
+            php artisan up

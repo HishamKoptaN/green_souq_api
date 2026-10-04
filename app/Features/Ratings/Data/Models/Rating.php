@@ -5,12 +5,14 @@ namespace App\Features\Ratings\Data\Models;
 use App\Features\Users\Data\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Rating extends Model
 {
     protected $fillable = [
         'evaluator_id',
-        'evaluated_id',
+        'rateable_type',
+        'rateable_id',
         'rating',
         'comment',
     ];
@@ -20,8 +22,8 @@ class Rating extends Model
         return $this->belongsTo(User::class, 'evaluator_id');
     }
 
-    public function evaluated(): BelongsTo
+    public function rateable(): MorphTo
     {
-        return $this->belongsTo(User::class, 'evaluated_id');
+        return $this->morphTo();
     }
 }

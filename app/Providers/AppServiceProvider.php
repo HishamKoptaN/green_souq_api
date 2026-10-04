@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Features\Posts\Data\Models\Comment;
 use App\Features\Posts\Data\Models\SocialPost;
+use App\Features\Shops\Data\Models\Shop;
 use App\Features\Storage\Data\Contracts\DirectUploadSignerInterface;
 use App\Features\Storage\Data\Strategies\AwsS3UploadSigner;
 use App\Features\Storage\Data\Strategies\CloudinaryUploadSigner;
@@ -34,6 +35,7 @@ class AppServiceProvider extends ServiceProvider
             'social' => SocialPost::class,
             'user' => User::class,
             'comment' => Comment::class,
+            'shop' => Shop::class,
         ]);
     }
 }
