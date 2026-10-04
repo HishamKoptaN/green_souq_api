@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Features\Storage\Data\strategies;
+namespace App\Features\Storage\Data\Strategies;
 
 use App\Features\Storage\Data\Contracts\DirectUploadSignerInterface;
 use Aws\S3\S3Client;
