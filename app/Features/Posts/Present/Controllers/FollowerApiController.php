@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\Social;
+namespace App\Features\Posts\Present\Controllers;
 
 use App\Features\Users\Data\Models\User;
 use App\Http\Resources\Social\FollowerResource;

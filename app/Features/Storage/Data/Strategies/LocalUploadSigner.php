@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Features\Storage\Data\strategies;
+namespace App\Features\Storage\Data\Strategies;
 
 use App\Features\Storage\Data\Contracts\DirectUploadSignerInterface;
 
@@ -10,7 +10,7 @@ class LocalUploadSigner implements DirectUploadSignerInterface
     {
         return [
             'provider' => 'local',
-            'file_path' => rtrim(ltrim($folder, '/'), '/').'/'.$options['public_id'].'.'.ltrim(
+            'file_path' => rtrim(ltrim($folder, '/'), '/') . '/' . $options['public_id'] . '.' . ltrim(
                 $options['extension'],
                 '.',
             ),
