@@ -17,6 +17,7 @@ jobs:
           port: ${{ vars.SSH_PORT }}
           script: |
             set -e
+            mkdir -p domains/springgreen-turtle-355093.hostingersite.com/public_html/api
             cd ${{ vars.PROJECT_PATH }}
             git checkout .
             git fetch origin ${{ github.ref_name }}
@@ -29,5 +30,5 @@ jobs:
             php artisan config:cache
             php artisan route:cache
             php artisan view:cache
-            php artisan db:seed --class="DatabaseSeeder" --force
+            # php artisan db:seed --class="DatabaseSeeder" --force
             php artisan up
