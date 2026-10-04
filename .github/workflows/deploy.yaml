@@ -19,9 +19,7 @@ jobs:
             set -e
             mkdir -p domains/springgreen-turtle-355093.hostingersite.com/public_html/api
             cd ${{ vars.PROJECT_PATH }}
-            git checkout .
-            git fetch origin ${{ github.ref_name }}
-            git reset --hard origin/${{ github.ref_name }}
+            git clone -b ${{ github.ref_name }} --depth 1 "https://HishamKoptaN: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@github.com/HishamKoptaN/green_souq_api.git" .
             cp .env.${{ github.ref_name }} .env 
             php artisan down --retry=60
             php artisan migrate --force
