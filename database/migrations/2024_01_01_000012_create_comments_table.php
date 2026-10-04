@@ -4,16 +4,16 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     public function up()
     {
         Schema::create(
-            'posts',
+            'comments',
             function (Blueprint $table) {
                 $table->id();
+                $table->morphs('commentable');
                 $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
-                $table->nullableMorphs('postable');
+                $table->text('comment');
                 $table->timestamps();
             },
         );
@@ -21,8 +21,6 @@ return new class extends Migration
 
     public function down()
     {
-        Schema::dropIfExists(
-            'posts',
-        );
+        Schema::dropIfExists('comments');
     }
 };
