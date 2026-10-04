@@ -29,10 +29,10 @@ jobs:
             composer install --optimize-autoloader --no-dev --ignore-platform-reqs --no-scripts
             php artisan down --retry=60
             composer dump-autoload --optimize --no-scripts
+            php artisan migrate --force
             php artisan optimize:clear
             php artisan config:cache
             php artisan route:cache
             php artisan view:cache
             php artisan up
-            # php artisan migrate --force
             # php artisan db:seed --class="DatabaseSeeder" --force
