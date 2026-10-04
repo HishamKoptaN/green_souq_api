@@ -26,13 +26,13 @@ jobs:
             git fetch origin ${{ github.ref_name }}
             git reset --hard origin/${{ github.ref_name }}
             cp .env.${{ github.ref_name }} .env 
-            composer install --optimize-autoloader --no-dev
+            composer install --optimize-autoloader --no-dev --ignore-platform-reqs
             php artisan down --retry=60
             composer dump-autoload --optimize --no-scripts
             php artisan optimize:clear
             php artisan config:cache
             php artisan route:cache
             php artisan view:cache
-            php artisan migrate --force
-            php artisan db:seed --class="DatabaseSeeder" --force
             php artisan up
+            # php artisan migrate --force
+            # php artisan db:seed --class="DatabaseSeeder" --force
