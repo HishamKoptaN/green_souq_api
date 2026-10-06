@@ -4,6 +4,8 @@ namespace App\Features\Storage\Data\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class Media extends Model
 {
@@ -21,7 +23,17 @@ class Media extends Model
     protected $casts = [
         'metadata' => 'array',
     ];
-
+    protected function filePath(): Attribute
+    {
+        return Attribute::make(
+            get: function ($value) {
+                if (!$value) {
+                    return null;
+                }
+                return Storage::disk($this->disk)->url($value);
+            }
+        );
+    }
     public function mediable(): MorphTo
     {
         return $this->morphTo();

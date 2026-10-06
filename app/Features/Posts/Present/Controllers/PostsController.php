@@ -7,6 +7,7 @@ use App\Features\Posts\Data\Models\Post;
 use App\Features\Posts\DTOs\CreatePostDTO;
 use App\Features\Posts\Present\Resources\PostResource;
 use App\Features\Posts\Requests\StorePostRequest;
+use App\Features\Storage\Data\Contracts\DirectUploadSignerInterface;
 use App\Features\Users\Data\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -17,7 +18,7 @@ class PostsController
     public function index(Request $request)
     {
         $user = Auth::guard('sanctum')->user();
-        $query = Post::with(['author', 'postable'])->latest();
+        $query = Post::with(['author', 'postable', 'media'])->latest();
         if ($request->has('user_id')) {
             $targetUserId = $request->query('user_id');
             if ((int) $targetUserId === $user->id) {
@@ -44,6 +45,23 @@ class PostsController
         }
 
         return new PostResource($user);
+    }
+
+    public function presigned(Request $request, DirectUploadSignerInterface $signer)
+    {
+        $request->validate([
+            'extension' => 'required|string|max:10',
+        ]);
+
+        return response()->json(
+            $signer->generateSignature(
+                'posts/media',
+                options: [
+                    'public_id' => Auth::guard('sanctum')->user()->id . '_' . time() . '_' . rand(1000, 9999),
+                    'extension' => $request->input('extension'),
+                ]
+            ),
+        );
     }
 
     public function store(StorePostRequest $request, CreatePostAction $action): JsonResponse

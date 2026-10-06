@@ -15,10 +15,31 @@ class CreatePostAction
             $post = Post::create([
                 'user_id' => $dto->userId,
             ]);
-            $strategy = PostStrategyFactory::resolve($dto->type);
-            $strategy->handle($post, array_merge($dto->typeData, ['content' => $dto->content]));
+            PostStrategyFactory::resolve($dto->type)->handle(
+                $post,
+                array_merge(
+                    $dto->typeData,
+                    ['content' => $dto->content],
+                ),
+            );
+            foreach ($dto->mediaFiles as $mediaItem) {
+                if (! $mediaItem) {
+                    continue;
+                }
 
-            return $post->load(['user', 'postable']);
+                $filePath = is_array($mediaItem) ? ($mediaItem['file_path'] ?? null) : $mediaItem;
+                $disk = is_array($mediaItem) ? ($mediaItem['disk'] ?? 'public') : 'public';
+
+                if ($filePath) {
+                    $post->media()->create([
+                        'file_path' => $filePath,
+                        'disk' => $disk,
+                        'file_type' => preg_match('/\.(mp4|mov|avi|webm|mkv)$/i', $filePath) ? 'video' : 'image',
+                    ]);
+                }
+            }
+
+            return $post->load(['user', 'postable', 'media']);
         });
     }
 }

@@ -16,12 +16,12 @@ class PostResource extends JsonResource
             'id' => $this->id,
             'type' => $this->postable_type,
             'author' => $this->author,
+            'media' => $this->whenLoaded('media'),
             'postable' => new PostableResource(
                 $this->whenLoaded(
                     'postable',
                 ),
             ),
-
             // 'cmnters_images' => Comment::where('commentable_id', $this->id)
             // ->where('commentable_type', Post::class)
             // ->with('user.userable')

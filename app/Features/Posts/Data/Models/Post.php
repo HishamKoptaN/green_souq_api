@@ -2,6 +2,7 @@
 
 namespace App\Features\Posts\Data\Models;
 
+use App\Features\Storage\Data\Models\Media;
 use App\Features\Users\Data\Models\User;
 use App\Models\Global\Hide;
 use App\Models\Global\Report;
@@ -30,6 +31,11 @@ class Post extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
+    public function media()
+    {
+        return $this->morphMany(Media::class, 'mediable');
+    }
+
     public function parent()
     {
         return $this->belongsTo(Post::class, 'parent_id');
@@ -48,11 +54,6 @@ class Post extends Model
     public function hides()
     {
         return $this->morphMany(Hide::class, 'hideable');
-    }
-
-    public function getPublishAtAttribute($value)
-    {
-        return Carbon::parse($value);
     }
 
     public function postable()
@@ -96,62 +97,19 @@ class Post extends Model
         return PostFactory::new();
     }
 
-    public function getStatusAttribute()
-    {
-        if (is_null($this->publish_at)) {
-            return 'draft';
-        }
-        if ($this->publish_at > now()) {
-            return 'scheduled';
-        }
-
-        return 'published';
-    }
-
-    public function sharedByUsers()
+    public function sharedUsers()
     {
         return $this->belongsToMany(User::class, 'post_shares')->withTimestamps();
-    }
-
-    public function scopePublished(
-        $query,
-    ) {
-        return $query->whereNotNull(
-            'publish_at',
-        )
-            ->where(
-                'publish_at',
-                '<=',
-                now(),
-            );
-    }
-
-    public function scopeNews(
-        $query,
-    ) {
-        return $query->where(
-            'type',
-            'news',
-        );
     }
 
     public function getIsFollowingAttribute()
     {
         $authUser = auth()->user();
-        if (! $authUser) {
+        if (!$authUser) {
             return false;
         }
 
         return $authUser->following()->where('followed_id', $this->user_id)->exists();
-    }
-
-    public function scopeCompany(
-        $query,
-    ) {
-        return $query->where(
-            'type',
-            'company',
-        );
     }
 
     public function scopeRegular(

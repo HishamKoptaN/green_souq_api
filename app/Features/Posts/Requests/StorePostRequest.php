@@ -16,7 +16,8 @@ class StorePostRequest extends FormRequest
     {
         return [
             'type' => ['required', Rule::in(['social', 'news', 'event', 'poll'])],
-            'content' => ['required_if:type,social,news', 'nullable', 'string'],
+            'content' => ['nullable', 'string'],
+            'media' => ['nullable', 'array'],
             'media.*' => ['nullable'],
             'type_data' => ['required_if:type,event,poll', 'array'],
             'type_data.event_date' => ['required_if:type,event', 'date', 'after:now'],

@@ -32,6 +32,7 @@ class AwsS3UploadSigner implements DirectUploadSignerInterface
         ]);
 
         return [
+            'disk' => 's3',
             'upload_url' => (string) $client->createPresignedRequest($command, '+10 minutes')->getUri(),
             //  'file_path' => $path,
             //  'content_type' => $contentType,

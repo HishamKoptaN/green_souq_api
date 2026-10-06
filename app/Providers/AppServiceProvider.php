@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Features\Posts\Data\Models\Comment;
+use App\Features\Posts\Data\Models\Post;
 use App\Features\Posts\Data\Models\SocialPost;
 use App\Features\Shops\Data\Models\Shop;
 use App\Features\Storage\Data\Contracts\DirectUploadSignerInterface;
@@ -32,6 +33,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Relation::enforceMorphMap([
+            'post' => Post::class,
             'social' => SocialPost::class,
             'user' => User::class,
             'comment' => Comment::class,
