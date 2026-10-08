@@ -5,6 +5,7 @@ return [
     'allowed_methods' => ['*'],
     'allowed_origins' => [
         'https://greensoouq.vercel.app',
+        'https://springgreen-turtle-355093.hostingersite.com',
         'http://localhost:*',
     ],
     'allowed_origins_patterns' => [],
