@@ -6,7 +6,6 @@ use App\Features\Storage\Data\Models\Media;
 use App\Features\Users\Data\Models\User;
 use App\Models\Global\Hide;
 use App\Models\Global\Report;
-use Carbon\Carbon;
 use Database\Factories\social\post\PostFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -105,7 +104,7 @@ class Post extends Model
     public function getIsFollowingAttribute()
     {
         $authUser = auth()->user();
-        if (!$authUser) {
+        if (! $authUser) {
             return false;
         }
 
