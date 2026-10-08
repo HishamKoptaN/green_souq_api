@@ -17,7 +17,7 @@ jobs:
           port: ${{ vars.SSH_PORT }}
           script: |
             set -e
-            mkdir -p domains/springgreen-turtle-355093.hostingersite.com/public_html/api
+            mkdir -p domains/springgreen-turtle-355093.hostingersite.com/public_html
             cd ${{ vars.PROJECT_PATH }}
             if [ ! -d ".git" ]; then
             git clone -b ${{ github.ref_name }} "https://HishamKoptaN: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@github.com/HishamKoptaN/green_souq_api.git" .
