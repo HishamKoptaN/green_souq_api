@@ -5,7 +5,6 @@ namespace App\Features\Users\Present\Http\Controllers;
 use App\Events\Users\UserRegistered;
 use App\Features\Firebase\Domain\UseCases\FirebaseUseCases;
 use App\Features\Users\Data\Models\User;
-use App\Features\Users\Domain\UseCases\RegisterUserUseCase;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -56,7 +55,7 @@ class AuthController
         }
     }
 
-    public function signUp(Request $request, RegisterUserUseCase $registerUserUseCase)
+    public function signUp(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255',
@@ -66,7 +65,9 @@ class AuthController
             'latitude' => 'nullable|numeric|between:-90,90',
             'longitude' => 'nullable|numeric|between:-180,180',
         ]);
-        $user = $registerUserUseCase->execute($request->all());
+
+        // Verifying first keeps retries safe: no user row is touched when the
+        // Firebase token is invalid.
         $firebaseUid = $this->firebaseUseCases->verifiedIdToken($request);
         $user = User::updateOrCreate(
             ['firebase_uid' => $firebaseUid],
