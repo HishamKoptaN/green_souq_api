@@ -61,7 +61,7 @@ class AuthController
             'name' => 'required|string|max:255',
             'user_type' => 'required|string',
             'phone' => 'nullable|string|max:20',
-            'address' => 'nullable|string|max:20',
+            'address' => 'nullable|string|max:255',
             'latitude' => 'nullable|numeric|between:-90,90',
             'longitude' => 'nullable|numeric|between:-180,180',
         ]);
@@ -75,6 +75,9 @@ class AuthController
                 'name' => $request->name,
                 'user_type' => $request->user_type,
                 'phone' => $request->phone,
+                'address' => $request->address,
+                'latitude' => $request->latitude,
+                'longitude' => $request->longitude,
                 'image' => $request->image,
             ]
         );
