@@ -11,6 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
+use Kreait\Firebase\Exception\Auth\FailedToVerifyToken;
 
 class AuthController
 {
@@ -46,7 +47,7 @@ class AuthController
                 'token' => $user->createToken('auth', ['*'], now()->addWeek())->plainTextToken,
             ]);
         } catch (\Throwable $e) {
-            $status = ($e instanceof InvalidToken) ? 401 : 500;
+            $status = ($e instanceof FailedToVerifyToken) ? 401 : 500;
 
             return failureRes(
                 'فشلت عملية تسجيل الدخول',
