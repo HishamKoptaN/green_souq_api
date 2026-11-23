@@ -61,7 +61,7 @@ class FirebaseUseCases
 
     public function verifiedIdToken($request)
     {
-        $id_token = $request->input('id_token');
+        $id_token = $request->input('id_token') ?? $request->input('idToken');
         $verifiedIdToken = $this->auth->verifyIdToken(
             $id_token,
         );
