@@ -3,6 +3,7 @@
 namespace App\Features\Profile\Present\Controllers;
 
 use App\Features\Firebase\Domain\UseCases\FirebaseUseCases;
+use App\Features\Profile\Requests\UpdateProfileRequest;
 use App\Features\Storage\Data\Contracts\DirectUploadSignerInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -49,7 +50,7 @@ class ProfileUserController
         );
     }
 
-    public function store(Request $request)
+    public function store(UpdateProfileRequest $request)
     {
         try {
             $user = Auth::guard('sanctum')->user();
@@ -60,11 +61,9 @@ class ProfileUserController
                 }
                 $user->avatar = $newAvatar;
             }
-            $user = tap($user)->update($request->all());
+            $user = tap($user)->update($request->validated());
 
             return successRes($user);
-        } catch (\ValidationException $e) {
-            return failureRes($e->errors());
         } catch (\Exception $e) {
             return failureRes($e->getMessage());
         }
