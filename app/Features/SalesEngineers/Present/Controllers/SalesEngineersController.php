@@ -4,6 +4,7 @@ namespace App\Features\SalesEngineers\Present\Controllers;
 
 use App\Features\SalesEngineers\Present\Resources\SalesEngineerResource;
 use App\Features\Users\Data\Models\User;
+use App\Features\Users\Domain\Enums\UserType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -16,7 +17,10 @@ class SalesEngineersController
             return failureRes(null, 401, 'غير مصرح بالدخول');
         }
         $query = $request->input('query');
-        $salesEngineers = User::where('user_type', 'salesEngineer')->with([
+        $salesEngineers = User::where(
+            'user_type',
+            UserType::SalesEngineer->value,
+        )->with([
             'receivedRatings' => function ($q) use ($user) {
                 $q->where('evaluator_id', $user->id);
             },
