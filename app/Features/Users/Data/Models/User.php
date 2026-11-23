@@ -12,7 +12,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\HasApiTokens;
 
-#[Fillable(['firebase_uid', 'name', 'bio', 'user_type', 'phone', 'address', 'latitude', 'longitude'])]
+#[Fillable(['firebase_uid', 'name', 'bio', 'user_type', 'phone', 'avatar', 'address', 'latitude', 'longitude'])]
 #[Hidden(['remember_token'])]
 class User extends Authenticatable
 {

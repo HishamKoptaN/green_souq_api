@@ -5,10 +5,12 @@ namespace App\Features\Users\Present\Http\Controllers;
 use App\Events\Users\UserRegistered;
 use App\Features\Firebase\Domain\UseCases\FirebaseUseCases;
 use App\Features\Users\Data\Models\User;
+use App\Features\Users\Domain\Enums\UserType;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class AuthController
 {
@@ -59,11 +61,12 @@ class AuthController
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'user_type' => 'required|string',
+            'user_type' => ['required', Rule::enum(UserType::class)],
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string|max:255',
             'latitude' => 'nullable|numeric|between:-90,90',
             'longitude' => 'nullable|numeric|between:-180,180',
+            'avatar' => 'nullable|string|max:255',
         ]);
 
         // Verifying first keeps retries safe: no user row is touched when the
@@ -78,7 +81,7 @@ class AuthController
                 'address' => $request->address,
                 'latitude' => $request->latitude,
                 'longitude' => $request->longitude,
-                'image' => $request->image,
+                'avatar' => $request->avatar,
             ]
         );
 
