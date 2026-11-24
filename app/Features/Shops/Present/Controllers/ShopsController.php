@@ -14,7 +14,7 @@ class ShopsController
     {
         $user = Auth::guard('sanctum')->user();
         if (! $user) {
-            return failureRes(null, 401, 'غير مصرح بالدخول');
+            return failureRes('غير مصرح بالدخول', 401);
         }
         $query = $request->input('query');
         $shops = User::whereIn(
