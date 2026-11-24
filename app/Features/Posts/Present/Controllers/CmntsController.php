@@ -27,9 +27,9 @@ class CmntsController
                 ),
             );
         } catch (\Exception $e) {
-            return failureRes(
-                $e->getMessage(),
-            );
+            report($e);
+
+            return failureRes('تعذّر تحميل التعليقات، الرجاء المحاولة مرة أخرى');
         }
     }
 
@@ -45,7 +45,9 @@ class CmntsController
 
             return successRes(new CmntResource($comment), 200);
         } catch (\Exception $e) {
-            return failureRes($e->getMessage());
+            report($e);
+
+            return failureRes('تعذّر تحميل التعليق، الرجاء المحاولة مرة أخرى');
         }
     }
 
@@ -74,7 +76,9 @@ class CmntsController
             // );
             return successRes(new CmntResource($comment->fresh()), 201);
         } catch (\Exception $e) {
-            return failureRes($e->getMessage());
+            report($e);
+
+            return failureRes('تعذّر إضافة التعليق، الرجاء المحاولة مرة أخرى');
         }
     }
 }
