@@ -22,7 +22,7 @@ class AuthController
         try {
             $user = Auth::guard('sanctum')->user();
             if (! $user) {
-                return failureRes(null, 401, 'غير مصرح بالدخول');
+                return failureRes('غير مصرح بالدخول', 401);
             }
 
             return successRes(
@@ -30,7 +30,7 @@ class AuthController
                 200,
             );
         } catch (Exception $e) {
-            return failureRes($e->getMessage(), 500, 'حدث خطأ أثناء التحقق من المصادقة');
+            return failureRes('حدث خطأ أثناء التحقق من المصادقة', 500, $e->getMessage());
         }
     }
 
