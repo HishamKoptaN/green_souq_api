@@ -47,7 +47,7 @@ class AuthController
                 'token' => $user->createToken('auth', ['*'], now()->addWeek())->plainTextToken,
             ]);
         } catch (\Throwable $e) {
-            $status = ($e instanceof InvalidToken) ? 401 : 500;
+            $status = ($e instanceof FailedToVerifyToken) ? 401 : 500;
 
             return failureRes(
                 'فشلت عملية تسجيل الدخول',
