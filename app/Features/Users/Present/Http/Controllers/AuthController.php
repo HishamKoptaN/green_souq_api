@@ -11,6 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
+use Kreait\Firebase\Exception\Auth\FailedToVerifyToken;
 
 class AuthController
 {
@@ -71,7 +72,25 @@ class AuthController
 
         // Verifying first keeps retries safe: no user row is touched when the
         // Firebase token is invalid.
-        $firebaseUid = $this->firebaseUseCases->verifiedIdToken($request);
+        try {
+            $firebaseUid = $this->firebaseUseCases->verifiedIdToken($request);
+        } catch (FailedToVerifyToken) {
+            return failureRes(
+                'رمز الدخول غير صالح أو منتهي الصلاحية، الرجاء تسجيل الدخول مرة أخرى',
+                401,
+                null,
+                'INVALID_ID_TOKEN'
+            );
+        } catch (\Throwable $e) {
+            report($e);
+
+            return failureRes(
+                'تعذّر التحقق من حسابك، الرجاء المحاولة مرة أخرى',
+                500,
+                null,
+                'TOKEN_VERIFICATION_FAILED'
+            );
+        }
         $user = User::updateOrCreate(
             ['firebase_uid' => $firebaseUid],
             [
