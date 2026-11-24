@@ -1,5 +1,7 @@
 <?php
 
+use App\Features\Firebase\Domain\Exceptions\FirebaseCredentialsMissing;
+use App\Http\Middleware\AllowPrivateNetwork;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -23,10 +25,19 @@ return Application::configure(basePath: dirname(__DIR__))
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->prepend(\App\Http\Middleware\AllowPrivateNetwork::class);
+        $middleware->prepend(AllowPrivateNetwork::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
+
+        $exceptions->render(function (FirebaseCredentialsMissing $e, Request $request) {
+            return failureRes(
+                'خدمة الدخول غير مهيأة حالياً، الرجاء المحاولة لاحقاً',
+                503,
+                null,
+                'FIREBASE_CONFIG_MISSING'
+            );
+        });
     })->create();
