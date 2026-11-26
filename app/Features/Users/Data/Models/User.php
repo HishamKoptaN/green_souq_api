@@ -2,8 +2,10 @@
 
 namespace App\Features\Users\Data\Models;
 
+use App\Features\Admin\Data\Models\Role;
 use App\Features\Ratings\Data\Models\Rating;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -69,5 +71,20 @@ class User extends Authenticatable
     public function receivedRatings()
     {
         return $this->morphMany(Rating::class, 'rateable');
+    }
+
+    public function roles(): BelongsToMany
+    {
+        return $this->belongsToMany(Role::class, 'user_has_roles');
+    }
+
+    public function hasRole(string $name): bool
+    {
+        return $this->roles()->where('name', $name)->exists();
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->hasRole('admin') || $this->hasRole('super-admin');
     }
 }
