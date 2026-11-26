@@ -35,7 +35,7 @@ class AdminCrudController
         'tickets' => ['subject' => 'sometimes|string|max:255', 'type' => 'sometimes|string|max:50', 'description' => 'sometimes|string', 'status' => 'sometimes|in:open,closed'],
         'complaints' => ['title' => 'sometimes|string|max:255', 'description' => 'sometimes|string', 'status' => 'sometimes|string|max:50'],
         'suggestions' => ['title' => 'sometimes|string|max:255', 'description' => 'sometimes|string', 'status' => 'sometimes|string|max:50'],
-        'jobs' => ['title' => 'sometimes|string|max:255', 'description' => 'sometimes|string', 'location' => 'sometimes|string|max:255', 'company_name' => 'sometimes|string|max:255'],
+        'jobs' => ['title' => 'required|string|max:255', 'description' => 'required|string', 'location' => 'sometimes|string|max:255', 'company_name' => 'sometimes|string|max:255', 'status' => 'sometimes|in:open,closed'],
         'notifications' => ['title' => 'sometimes|string|max:255', 'body' => 'sometimes|string', 'type' => 'sometimes|string|max:50'],
     ];
 

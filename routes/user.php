@@ -1,5 +1,6 @@
 <?php
 
+use App\Features\Jobs\Present\Controllers\JobsController;
 use App\Features\Notifications\Present\Controllers\NotificationsApiController;
 use App\Features\Posts\Present\Controllers\CmntsController;
 use App\Features\Posts\Present\Controllers\LikesController;
@@ -36,6 +37,7 @@ Route::middleware('auth:sanctum')->group(function () {
     );
     Route::apiResource('/support-tickets', SupportTicketsController::class);
 
+    Route::get('/jobs', [JobsController::class, 'index']);
     Route::get('/notifications', [NotificationsApiController::class, 'get']);
     Route::apiResource('/profile', ProfileUserController::class);
     Route::post('/profile/presigned', [ProfileUserController::class, 'presigned']);
