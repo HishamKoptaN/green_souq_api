@@ -5,6 +5,8 @@ return [
     'allowed_methods' => ['*'],
     'allowed_origins' => [
         'https://greensoouq-dev.web.app',
+        'https://green-soouq.web.app',
+        'https://green-soouq.firebaseapp.com',
         'http://localhost:*',
     ],
     'allowed_origins_patterns' => [
