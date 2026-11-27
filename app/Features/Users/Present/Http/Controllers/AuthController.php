@@ -5,11 +5,13 @@ namespace App\Features\Users\Present\Http\Controllers;
 use App\Events\Users\UserRegistered;
 use App\Features\Firebase\Domain\UseCases\FirebaseUseCases;
 use App\Features\Users\Data\Models\User;
-use App\Features\Users\Domain\UseCases\RegisterUserUseCase;
+use App\Features\Users\Domain\Enums\UserType;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
+use Kreait\Firebase\Exception\Auth\FailedToVerifyToken;
 
 class AuthController
 {
@@ -20,7 +22,7 @@ class AuthController
         try {
             $user = Auth::guard('sanctum')->user();
             if (! $user) {
-                return failureRes(null, 401, 'غير مصرح بالدخول');
+                return failureRes('غير مصرح بالدخول', 401);
             }
 
             return successRes(
@@ -28,7 +30,7 @@ class AuthController
                 200,
             );
         } catch (Exception $e) {
-            return failureRes($e->getMessage(), 500, 'حدث خطأ أثناء التحقق من المصادقة');
+            return failureRes('حدث خطأ أثناء التحقق من المصادقة', 500, $e->getMessage());
         }
     }
 
@@ -45,7 +47,7 @@ class AuthController
                 'token' => $user->createToken('auth', ['*'], now()->addWeek())->plainTextToken,
             ]);
         } catch (\Throwable $e) {
-            $status = ($e instanceof InvalidToken) ? 401 : 500;
+            $status = ($e instanceof FailedToVerifyToken) ? 401 : 500;
 
             return failureRes(
                 'فشلت عملية تسجيل الدخول',
@@ -56,25 +58,49 @@ class AuthController
         }
     }
 
-    public function signUp(Request $request, RegisterUserUseCase $registerUserUseCase)
+    public function signUp(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'user_type' => 'required|string',
+            'user_type' => ['required', Rule::enum(UserType::class)],
             'phone' => 'nullable|string|max:20',
-            'address' => 'nullable|string|max:20',
+            'address' => 'nullable|string|max:255',
             'latitude' => 'nullable|numeric|between:-90,90',
             'longitude' => 'nullable|numeric|between:-180,180',
+            'avatar' => 'nullable|string|max:255',
         ]);
-        $user = $registerUserUseCase->execute($request->all());
-        $firebaseUid = $this->firebaseUseCases->verifiedIdToken($request);
+
+        // Verifying first keeps retries safe: no user row is touched when the
+        // Firebase token is invalid.
+        try {
+            $firebaseUid = $this->firebaseUseCases->verifiedIdToken($request);
+        } catch (FailedToVerifyToken) {
+            return failureRes(
+                'رمز الدخول غير صالح أو منتهي الصلاحية، الرجاء تسجيل الدخول مرة أخرى',
+                401,
+                null,
+                'INVALID_ID_TOKEN'
+            );
+        } catch (\Throwable $e) {
+            report($e);
+
+            return failureRes(
+                'تعذّر التحقق من حسابك، الرجاء المحاولة مرة أخرى',
+                500,
+                null,
+                'TOKEN_VERIFICATION_FAILED'
+            );
+        }
         $user = User::updateOrCreate(
             ['firebase_uid' => $firebaseUid],
             [
                 'name' => $request->name,
                 'user_type' => $request->user_type,
                 'phone' => $request->phone,
-                'image' => $request->image,
+                'address' => $request->address,
+                'latitude' => $request->latitude,
+                'longitude' => $request->longitude,
+                'avatar' => $request->avatar,
             ]
         );
 

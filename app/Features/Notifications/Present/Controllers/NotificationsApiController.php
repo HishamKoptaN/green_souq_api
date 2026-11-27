@@ -58,9 +58,9 @@ class NotificationsApiController
 
             return successRes(NotificationResource::collection($notifications), 200);
         } catch (\Exception $e) {
-            return failureRes(
-                $e->getMessage(),
-            );
+            report($e);
+
+            return failureRes('تعذّر تحميل الإشعارات، الرجاء المحاولة مرة أخرى');
         }
     }
 
@@ -80,9 +80,9 @@ class NotificationsApiController
                 'Notification marked as read'
             );
         } catch (\Exception $e) {
-            return failureRes(
-                $e->getMessage(),
-            );
+            report($e);
+
+            return failureRes('تعذّر تحديد الإشعار كمقروء، الرجاء المحاولة مرة أخرى');
         }
     }
 
@@ -118,9 +118,9 @@ class NotificationsApiController
                 'All notifications marked as read'
             );
         } catch (\Exception $e) {
-            return failureRes(
-                $e->getMessage(),
-            );
+            report($e);
+
+            return failureRes('تعذّر تحديد الإشعارات كمقروءة، الرجاء المحاولة مرة أخرى');
         }
     }
 
@@ -141,9 +141,9 @@ class NotificationsApiController
                 'Notification deleted successfully'
             );
         } catch (\Exception $e) {
-            return failureRes(
-                $e->getMessage(),
-            );
+            report($e);
+
+            return failureRes('تعذّر حذف الإشعار، الرجاء المحاولة مرة أخرى');
         }
     }
 }

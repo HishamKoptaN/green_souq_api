@@ -3,8 +3,8 @@
 namespace App\Features\Firebase\Domain\UseCases;
 
 use App\Features\Firebase\Data\Models\FcmToken;
+use App\Features\Firebase\Domain\Exceptions\FirebaseCredentialsMissing;
 use App\Models\Users\Device;
-use Exception;
 use Kreait\Firebase\Auth;
 use Kreait\Firebase\Factory;
 use Kreait\Firebase\Messaging;
@@ -21,7 +21,7 @@ class FirebaseUseCases
     {
         $credentialsPath = config('services.firebase.credentials');
         if (! $credentialsPath || ! file_exists($credentialsPath)) {
-            throw new Exception("Firebase credentials file missing at: {$credentialsPath}");
+            throw new FirebaseCredentialsMissing("Firebase credentials file missing at: {$credentialsPath}");
         }
         $this->factory = (new Factory)->withServiceAccount($credentialsPath);
         $this->auth = $this->factory->createAuth();
@@ -61,7 +61,7 @@ class FirebaseUseCases
 
     public function verifiedIdToken($request)
     {
-        $id_token = $request->input('id_token');
+        $id_token = $request->input('id_token') ?? $request->input('idToken');
         $verifiedIdToken = $this->auth->verifyIdToken(
             $id_token,
         );

@@ -4,6 +4,7 @@ namespace App\Features\Shops\Present\Controllers;
 
 use App\Features\Shops\Present\Resources\ShopResource;
 use App\Features\Users\Data\Models\User;
+use App\Features\Users\Domain\Enums\UserType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -13,10 +14,13 @@ class ShopsController
     {
         $user = Auth::guard('sanctum')->user();
         if (! $user) {
-            return failureRes(null, 401, 'غير مصرح بالدخول');
+            return failureRes('غير مصرح بالدخول', 401);
         }
         $query = $request->input('query');
-        $shops = User::whereIn('user_type', ['farmer', 'shop'])->with([
+        $shops = User::whereIn(
+            'user_type',
+            [UserType::Farmer->value, UserType::Shop->value],
+        )->with([
             'receivedRatings' => function ($q) use ($user) {
                 $q->where('evaluator_id', $user->id);
             },
