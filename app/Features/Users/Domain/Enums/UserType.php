@@ -8,4 +8,5 @@ enum UserType: string
     case SalesEngineer = 'salesEngineer';
     case Farmer = 'farmer';
     case AgriculturalToolsMerchant = 'agriculturalToolsMerchant';
+    case JobSeeker = 'jobSeeker';
 }

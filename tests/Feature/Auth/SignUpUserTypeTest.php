@@ -42,7 +42,7 @@ class SignUpUserTypeTest extends TestCase
 
     public function test_all_app_user_types_are_accepted(): void
     {
-        foreach (['shop', 'salesEngineer', 'farmer', 'agriculturalToolsMerchant'] as $type) {
+        foreach (['shop', 'salesEngineer', 'farmer', 'agriculturalToolsMerchant', 'jobSeeker'] as $type) {
             $this->postJson('/api/auth/sign-up', [
                 'name' => 'اسم',
                 'phone' => '',
@@ -53,7 +53,7 @@ class SignUpUserTypeTest extends TestCase
 
         $this->assertDatabaseHas('users', [
             'firebase_uid' => 'signup-uid',
-            'user_type' => 'agriculturalToolsMerchant',
+            'user_type' => 'jobSeeker',
         ]);
     }
 }
