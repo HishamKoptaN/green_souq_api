@@ -22,6 +22,12 @@ jobs:
             git fetch origin ${{ github.ref_name }}
             git reset --hard origin/${{ github.ref_name }}
             cp .env.${{ github.ref_name }} .env 
+            if [ "${{ github.ref_name }}" = "prod" ]; then
+              mkdir -p storage/app/firebase
+              printf '%s' '${{ secrets.FIREBASE_PROD_SDK_B64 }}' | base64 -d > storage/app/firebase/prod-firebase_admin_sdk.json
+              chmod 600 storage/app/firebase/prod-firebase_admin_sdk.json
+            fi
+            composer install --optimize-autoloader --no-dev --ignore-platform-reqs --no-scripts
             php artisan down --retry=60
             php artisan migrate --force
             composer dump-autoload --optimize --no-scripts
