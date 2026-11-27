@@ -11,8 +11,15 @@ use App\Features\SalesEngineers\Present\Controllers\SalesEngineersController;
 use App\Features\Shops\Present\Controllers\ShopsController;
 use App\Features\Storage\Present\Controllers\DirectUploadController;
 use App\Features\SupportTickets\Present\Controllers\SupportTicketsController;
+use App\Features\Firebase\Domain\UseCases\FirebaseUseCases;
+use Illuminate\Http\Request;
 
 Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/device-token', function (Request $request) {
+        app(FirebaseUseCases::class)->upsertFcm($request, auth()->id());
+
+        return response()->json(['message' => 'ok']);
+    });
     Route::apiResource('/posts', PostsController::class);
     Route::apiResource('/likes', LikesController::class);
     Route::apiResource('/cmnts', CmntsController::class);
