@@ -2,11 +2,22 @@ name: Continuous Deployment
 on:
   push:
     branches:
+      - dev
       - prod
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: Branch to deploy
+        required: true
+        type: choice
+        default: dev
+        options:
+          - dev
+          - prod
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: ${{ github.ref_name }}
+    environment: prod
     steps:
       - uses: appleboy/ssh-action@master
         with:
@@ -16,27 +27,60 @@ jobs:
           port: ${{ vars.SSH_PORT }}
           script: |
             set -e
-            mkdir -p domains/springgreen-turtle-355093.hostingersite.com/public_html
-            cd ${{ vars.PROJECT_PATH }}
+            if [ "${{ inputs.branch || github.ref_name }}" = "prod" ]; then
+              cd ${{ vars.PROJECT_PATH }}
+            else
+              cd domains/lawngreen-tapir-650317.hostingersite.com/public_html
+            fi
             if [ ! -d ".git" ]; then
-            git clone -b ${{ github.ref_name }} https://github.com/HishamKoptaN/green_souq_api.git .
+              git clone -b ${{ inputs.branch || github.ref_name }} https://github.com/HishamKoptaN/green_souq_api.git .deploy-clone
+              cp -a .deploy-clone/. .
+              rm -rf .deploy-clone
             fi
             git checkout .
-            git fetch origin ${{ github.ref_name }}
-            git reset --hard origin/${{ github.ref_name }}
-            cp .env.${{ github.ref_name }} .env 
-            if [ "${{ github.ref_name }}" = "prod" ]; then
-              mkdir -p storage/app/firebase
+            git fetch origin ${{ inputs.branch || github.ref_name }}
+            git reset --hard origin/${{ inputs.branch || github.ref_name }}
+            if [ "${{ inputs.branch || github.ref_name }}" = "prod" ]; then
+              cp .env.prod .env
+              sed -i 's|^APP_URL=.*|APP_URL=https://springgreen-turtle-355093.hostingersite.com|' .env
+              sed -i 's|^ DB_DATABASE=.*| DB_DATABASE=u943485201_green_souq|' .env
+              sed -i 's|^ DB_USERNAME=.*| DB_USERNAME=u943485201_green_souq|' .env
+            else
+              cp .env.example .env
+              sed -i 's|^APP_ENV=.*|APP_ENV=dev|' .env
+              sed -i 's|^APP_DEBUG=.*|APP_DEBUG=true|' .env
+              sed -i 's|^APP_URL=.*|APP_URL=https://lawngreen-tapir-650317.hostingersite.com|' .env
+              sed -i 's|^DB_CONNECTION=.*|DB_CONNECTION=mysql|' .env
+              sed -i 's|^# DB_HOST=.*|DB_HOST=localhost|' .env
+              sed -i 's|^# DB_PORT=.*|DB_PORT=3306|' .env
+              sed -i 's|^# DB_DATABASE=.*|DB_DATABASE=${{ secrets.DEV_DB_DATABASE }}|' .env
+              sed -i 's|^# DB_USERNAME=.*|DB_USERNAME=${{ secrets.DEV_DB_USERNAME }}|' .env
+              sed -i 's|^# DB_PASSWORD=.*|DB_PASSWORD=${{ secrets.DEV_DB_PASSWORD }}|' .env
+              sed -i 's|^CACHE_STORE=.*|CACHE_STORE=file|' .env
+              sed -i 's|^SESSION_DRIVER=.*|SESSION_DRIVER=file|' .env
+            fi
+            mkdir -p storage/app/firebase
+            if [ "${{ inputs.branch || github.ref_name }}" = "prod" ]; then
               printf '%s' '${{ secrets.FIREBASE_PROD_SDK_B64 }}' | base64 -d > storage/app/firebase/prod-firebase_admin_sdk.json
               chmod 600 storage/app/firebase/prod-firebase_admin_sdk.json
+              sed -i 's|^FIREBASE_ADMIN_SDK_PATH=.*|FIREBASE_ADMIN_SDK_PATH=app/firebase/prod-firebase_admin_sdk.json|' .env
+            else
+              printf '%s' '${{ secrets.FIREBASE_DEV_SDK_B64 }}' | base64 -d > storage/app/firebase/dev-firebase_admin_sdk.json
+              chmod 600 storage/app/firebase/dev-firebase_admin_sdk.json
+              sed -i 's|^FIREBASE_ADMIN_SDK_PATH=.*|FIREBASE_ADMIN_SDK_PATH=app/firebase/dev-firebase_admin_sdk.json|' .env
             fi
             composer install --optimize-autoloader --no-dev --ignore-platform-reqs --no-scripts
+            cp -a public/. .
+            sed -i "s|__DIR__.'/../vendor/autoload.php'|__DIR__.'/vendor/autoload.php'|" index.php
+            sed -i "s|__DIR__.'/../bootstrap/app.php'|__DIR__.'/bootstrap/app.php'|" index.php
+            if [ "${{ inputs.branch || github.ref_name }}" != "prod" ]; then
+              php artisan key:generate --force
+            fi
             php artisan down --retry=60
             php artisan migrate --force
+            composer dump-autoload --optimize --no-scripts
             php artisan optimize:clear
             php artisan config:cache
             php artisan route:cache
             php artisan view:cache
-            composer dump-autoload
             php artisan up
-            # php artisan db:seed --class="DatabaseSeeder" --force
