@@ -8,6 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (! Schema::hasTable('devices')) {
         Schema::create('devices', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')
@@ -24,6 +25,7 @@ return new class extends Migration
                 'device_id',
             ]);
         });
+        }
     }
 
     public function down(): void

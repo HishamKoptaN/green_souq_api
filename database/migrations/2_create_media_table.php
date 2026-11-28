@@ -8,6 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (! Schema::hasTable('media')) {
         Schema::create('media', function (Blueprint $table) {
             $table->id();
             $table->morphs('mediable');
@@ -17,6 +18,7 @@ return new class extends Migration
             $table->json('metadata')->nullable();
             $table->timestamps();
         });
+        }
     }
 
     public function down(): void

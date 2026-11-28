@@ -8,6 +8,7 @@ return new class extends Migration
 {
     public function up()
     {
+        if (! Schema::hasTable('social_posts')) {
         Schema::create(
             'social_posts',
             function (Blueprint $table) {
@@ -19,6 +20,7 @@ return new class extends Migration
                 $table->timestamps();
             },
         );
+        }
     }
 
     public function down()

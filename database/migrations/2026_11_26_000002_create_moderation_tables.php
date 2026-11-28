@@ -8,6 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (! Schema::hasTable('complaints')) {
         Schema::create('complaints', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
@@ -16,7 +17,9 @@ return new class extends Migration
             $table->string('status')->default('open');
             $table->timestamps();
         });
+        }
 
+        if (! Schema::hasTable('suggestions')) {
         Schema::create('suggestions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
@@ -25,7 +28,9 @@ return new class extends Migration
             $table->string('status')->default('new');
             $table->timestamps();
         });
+        }
 
+        if (! Schema::hasTable('jobs')) {
         Schema::create('jobs', function (Blueprint $table) {
             $table->id();
             $table->string('title');
@@ -35,7 +40,9 @@ return new class extends Migration
             $table->string('status')->default('open');
             $table->timestamps();
         });
+        }
 
+        if (! Schema::hasTable('reviews')) {
         Schema::create('reviews', function (Blueprint $table) {
             $table->id();
             $table->foreignId('reviewee_id')->constrained('users')->cascadeOnDelete();
@@ -43,6 +50,7 @@ return new class extends Migration
             $table->text('comment')->nullable();
             $table->timestamps();
         });
+        }
     }
 
     public function down(): void

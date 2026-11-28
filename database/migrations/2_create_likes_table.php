@@ -9,6 +9,7 @@ return new class extends Migration
     public function up()
     {
         if (! Schema::hasTable('likes')) {
+            if (! Schema::hasTable('likes')) {
             Schema::create(
                 'likes',
                 function (Blueprint $table) {
@@ -18,6 +19,7 @@ return new class extends Migration
                     $table->timestamps();
                 },
             );
+            }
         }
     }
 

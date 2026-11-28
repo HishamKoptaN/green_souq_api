@@ -9,6 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         if (! Schema::hasTable('users')) {
+            if (! Schema::hasTable('users')) {
             Schema::create('users', function (Blueprint $table) {
                 $table->id();
                 $table->string('firebase_uid')->unique()->nullable();
@@ -20,6 +21,7 @@ return new class extends Migration
                 $table->decimal('longitude', 11, 8)->nullable();
                 $table->timestamps();
             });
+            }
         }
     }
 

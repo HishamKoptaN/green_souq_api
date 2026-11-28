@@ -8,6 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (! Schema::hasTable('ratings')) {
         Schema::create('ratings', function (Blueprint $table) {
             $table->id();
             $table->foreignId('evaluator_id')
@@ -19,6 +20,7 @@ return new class extends Migration
             $table->timestamps();
             $table->unique(['evaluator_id', 'rateable_type', 'rateable_id'], 'unique_evaluator_rateable_pair');
         });
+        }
     }
 
     public function down(): void

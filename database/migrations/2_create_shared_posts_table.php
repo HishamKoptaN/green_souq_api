@@ -8,6 +8,7 @@ return new class extends Migration
 {
     public function up()
     {
+        if (! Schema::hasTable('shared_posts')) {
         Schema::create(
             'shared_posts',
             function (Blueprint $table) {
@@ -18,6 +19,7 @@ return new class extends Migration
                 $table->timestamps();
             },
         );
+        }
     }
 
     public function down()

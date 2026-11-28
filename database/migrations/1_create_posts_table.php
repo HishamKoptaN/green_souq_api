@@ -8,6 +8,7 @@ return new class extends Migration
 {
     public function up()
     {
+        if (! Schema::hasTable('posts')) {
         Schema::create(
             'posts',
             function (Blueprint $table) {
@@ -17,6 +18,7 @@ return new class extends Migration
                 $table->timestamps();
             },
         );
+        }
     }
 
     public function down()

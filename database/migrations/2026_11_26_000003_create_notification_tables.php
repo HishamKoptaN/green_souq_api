@@ -8,6 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (! Schema::hasTable('notifications')) {
         Schema::create('notifications', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
@@ -25,7 +26,9 @@ return new class extends Migration
             $table->string('action_url')->nullable();
             $table->timestamps();
         });
+        }
 
+        if (! Schema::hasTable('notification_user')) {
         Schema::create('notification_user', function (Blueprint $table) {
             $table->id();
             $table->foreignId('notification_id')->constrained('notifications')->cascadeOnDelete();
@@ -37,7 +40,9 @@ return new class extends Migration
 
             $table->unique(['notification_id', 'user_id']);
         });
+        }
 
+        if (! Schema::hasTable('fcm_tokens')) {
         Schema::create('fcm_tokens', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
@@ -45,6 +50,7 @@ return new class extends Migration
             $table->string('device_type')->nullable();
             $table->timestamps();
         });
+        }
     }
 
     public function down(): void

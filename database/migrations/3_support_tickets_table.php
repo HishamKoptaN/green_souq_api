@@ -8,6 +8,7 @@ return new class extends Migration
 {
     public function up()
     {
+        if (! Schema::hasTable('support_tickets')) {
         Schema::create(
             'support_tickets',
             function (Blueprint $table) {
@@ -20,6 +21,7 @@ return new class extends Migration
                 $table->timestamps();
             },
         );
+        }
     }
 
     public function down()
