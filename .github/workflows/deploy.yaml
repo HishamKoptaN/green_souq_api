@@ -30,9 +30,10 @@ jobs:
           username: ${{ vars.SSH_USER }}
           password: ${{ secrets.SSH_PASSWORD }}
           port: ${{ vars.SSH_PORT }}
+          capture_stdout: true
           script: |
             set -e
-            if [ "${{ inputs.diagnose }}" = "true" ]; then php -v; php -r 'echo PHP_VERSION;'; exit 0; fi
+            if [ "${{ inputs.diagnose }}" = "true" ]; then php -v; php artisan about || true; tail -80 storage/logs/laravel.log || true; exit 0; fi
             if [ "${{ inputs.branch || github.ref_name }}" = "prod" ]; then
               cd ${{ vars.PROJECT_PATH }}
             else
