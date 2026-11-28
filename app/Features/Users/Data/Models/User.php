@@ -20,6 +20,13 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
+    protected $fillable = [
+        'firebase_uid', 'name', 'bio', 'user_type', 'phone', 'avatar',
+        'address', 'latitude', 'longitude',
+    ];
+
+    protected $hidden = ['remember_token'];
+
     protected $appends = ['average_rating', 'ratings_count'];
 
     protected function casts(): array
