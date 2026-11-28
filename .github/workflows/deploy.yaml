@@ -78,6 +78,8 @@ jobs:
             fi
             composer install --optimize-autoloader --no-dev --ignore-platform-reqs --no-scripts
             cp -a public/. .
+            sed -i "s|__DIR__.'/../vendor/autoload.php'|__DIR__.'/vendor/autoload.php'|" index.php
+            sed -i "s|__DIR__.'/../bootstrap/app.php'|__DIR__.'/bootstrap/app.php'|" index.php
             if [ "${{ inputs.branch || github.ref_name }}" != "prod" ]; then
               php artisan key:generate --force
             fi
