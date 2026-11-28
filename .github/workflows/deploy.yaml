@@ -20,11 +20,16 @@ jobs:
             git checkout .
             git fetch origin ${{ github.ref_name }}
             git reset --hard origin/${{ github.ref_name }}
-            cp .env.${{ github.ref_name }} .env 
+            if [ -f .env.${{ github.ref_name }} ]; then cp .env.${{ github.ref_name }} .env; fi
+            mkdir -p storage/app/firebase
             if [ "${{ github.ref_name }}" = "prod" ]; then
-              mkdir -p storage/app/firebase
               printf '%s' '${{ secrets.FIREBASE_PROD_SDK_B64 }}' | base64 -d > storage/app/firebase/prod-firebase_admin_sdk.json
               chmod 600 storage/app/firebase/prod-firebase_admin_sdk.json
+              sed -i 's|^FIREBASE_ADMIN_SDK_PATH=.*|FIREBASE_ADMIN_SDK_PATH=app/firebase/prod-firebase_admin_sdk.json|' .env
+            else
+              printf '%s' '${{ secrets.FIREBASE_DEV_SDK_B64 }}' | base64 -d > storage/app/firebase/dev-firebase_admin_sdk.json
+              chmod 600 storage/app/firebase/dev-firebase_admin_sdk.json
+              sed -i 's|^FIREBASE_ADMIN_SDK_PATH=.*|FIREBASE_ADMIN_SDK_PATH=app/firebase/dev-firebase_admin_sdk.json|' .env
             fi
             composer install --optimize-autoloader --no-dev --ignore-platform-reqs --no-scripts
             php artisan down --retry=60
