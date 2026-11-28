@@ -2,6 +2,7 @@ name: Continuous Deployment
 on:
   push:
     branches:
+      - dev
       - prod
   workflow_dispatch:
     inputs:
@@ -30,7 +31,18 @@ jobs:
             git checkout .
             git fetch origin ${{ inputs.branch || github.ref_name }}
             git reset --hard origin/${{ inputs.branch || github.ref_name }}
-            if [ -f .env.${{ inputs.branch || github.ref_name }} ]; then cp .env.${{ inputs.branch || github.ref_name }} .env; fi
+            if [ "${{ inputs.branch || github.ref_name }}" = "prod" ]; then
+              cp .env.prod .env
+              sed -i 's|^APP_URL=.*|APP_URL=https://springgreen-turtle-355093.hostingersite.com|' .env
+              sed -i 's|^ DB_DATABASE=.*| DB_DATABASE=u943485201_green_souq|' .env
+              sed -i 's|^ DB_USERNAME=.*| DB_USERNAME=u943485201_green_souq|' .env
+            else
+              cp .env .env.backup
+              sed -i 's|^APP_ENV=.*|APP_ENV=dev|' .env
+              sed -i 's|^APP_URL=.*|APP_URL=https://lawngreen-tapir-650317.hostingersite.com|' .env
+              sed -i 's|^ DB_DATABASE=.*| DB_DATABASE=u943485201_green_dev|' .env
+              sed -i 's|^ DB_USERNAME=.*| DB_USERNAME=u943485201_green_dev|' .env
+            fi
             mkdir -p storage/app/firebase
             if [ "${{ inputs.branch || github.ref_name }}" = "prod" ]; then
               printf '%s' '${{ secrets.FIREBASE_PROD_SDK_B64 }}' | base64 -d > storage/app/firebase/prod-firebase_admin_sdk.json
