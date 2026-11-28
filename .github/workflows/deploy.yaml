@@ -61,6 +61,8 @@ jobs:
               sed -i 's|^# DB_DATABASE=.*|DB_DATABASE=${{ secrets.DEV_DB_DATABASE }}|' .env
               sed -i 's|^# DB_USERNAME=.*|DB_USERNAME=${{ secrets.DEV_DB_USERNAME }}|' .env
               sed -i 's|^# DB_PASSWORD=.*|DB_PASSWORD=${{ secrets.DEV_DB_PASSWORD }}|' .env
+              sed -i 's|^CACHE_STORE=.*|CACHE_STORE=file|' .env
+              sed -i 's|^SESSION_DRIVER=.*|SESSION_DRIVER=file|' .env
             fi
             mkdir -p storage/app/firebase
             if [ "${{ inputs.branch || github.ref_name }}" = "prod" ]; then
