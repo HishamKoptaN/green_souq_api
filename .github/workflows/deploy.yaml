@@ -33,7 +33,9 @@ jobs:
               cd domains/lawngreen-tapir-650317.hostingersite.com/public_html
             fi
             if [ ! -d ".git" ]; then
-              git clone -b ${{ inputs.branch || github.ref_name }} https://github.com/HishamKoptaN/green_souq_api.git .
+              git clone -b ${{ inputs.branch || github.ref_name }} https://github.com/HishamKoptaN/green_souq_api.git .deploy-clone
+              cp -a .deploy-clone/. .
+              rm -rf .deploy-clone
             fi
             git checkout .
             git fetch origin ${{ inputs.branch || github.ref_name }}
