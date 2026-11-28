@@ -46,11 +46,15 @@ jobs:
               sed -i 's|^ DB_DATABASE=.*| DB_DATABASE=u943485201_green_souq|' .env
               sed -i 's|^ DB_USERNAME=.*| DB_USERNAME=u943485201_green_souq|' .env
             else
-              cp .env .env.backup
+              cp .env.example .env
               sed -i 's|^APP_ENV=.*|APP_ENV=dev|' .env
               sed -i 's|^APP_URL=.*|APP_URL=https://lawngreen-tapir-650317.hostingersite.com|' .env
-              sed -i 's|^ DB_DATABASE=.*| DB_DATABASE=u943485201_green_dev|' .env
-              sed -i 's|^ DB_USERNAME=.*| DB_USERNAME=u943485201_green_dev|' .env
+              sed -i 's|^DB_CONNECTION=.*|DB_CONNECTION=mysql|' .env
+              sed -i 's|^# DB_HOST=.*|DB_HOST=localhost|' .env
+              sed -i 's|^# DB_PORT=.*|DB_PORT=3306|' .env
+              sed -i 's|^# DB_DATABASE=.*|DB_DATABASE=${{ secrets.DEV_DB_DATABASE }}|' .env
+              sed -i 's|^# DB_USERNAME=.*|DB_USERNAME=${{ secrets.DEV_DB_USERNAME }}|' .env
+              sed -i 's|^# DB_PASSWORD=.*|DB_PASSWORD=${{ secrets.DEV_DB_PASSWORD }}|' .env
             fi
             mkdir -p storage/app/firebase
             if [ "${{ inputs.branch || github.ref_name }}" = "prod" ]; then
@@ -63,6 +67,9 @@ jobs:
               sed -i 's|^FIREBASE_ADMIN_SDK_PATH=.*|FIREBASE_ADMIN_SDK_PATH=app/firebase/dev-firebase_admin_sdk.json|' .env
             fi
             composer install --optimize-autoloader --no-dev --ignore-platform-reqs --no-scripts
+            if [ "${{ inputs.branch || github.ref_name }}" != "prod" ]; then
+              php artisan key:generate --force
+            fi
             php artisan down --retry=60
             php artisan migrate --force
             composer dump-autoload --optimize --no-scripts
