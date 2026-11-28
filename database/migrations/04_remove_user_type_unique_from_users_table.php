@@ -8,16 +8,11 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            try {
+        if (Schema::hasIndex('users', 'users_user_type_unique')) {
+            Schema::table('users', function (Blueprint $table) {
                 $table->dropUnique('users_user_type_unique');
-            } catch (Throwable $e) {
-                try {
-                    $table->dropUnique(['user_type']);
-                } catch (Throwable $ex) {
-                }
-            }
-        });
+            });
+        }
     }
 
     public function down(): void
