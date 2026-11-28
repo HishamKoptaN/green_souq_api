@@ -14,11 +14,6 @@ on:
         options:
           - dev
           - prod
-      diagnose:
-        description: Print server PHP version and exit
-        required: false
-        type: boolean
-        default: false
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -30,7 +25,6 @@ jobs:
           username: ${{ vars.SSH_USER }}
           password: ${{ secrets.SSH_PASSWORD }}
           port: ${{ vars.SSH_PORT }}
-          capture_stdout: true
           script: |
             set -e
             if [ "${{ inputs.branch || github.ref_name }}" = "prod" ]; then
@@ -38,7 +32,6 @@ jobs:
             else
               cd domains/lawngreen-tapir-650317.hostingersite.com/public_html
             fi
-            if [ "${{ inputs.diagnose }}" = "true" ]; then php -v; php artisan about || true; tail -80 storage/logs/laravel.log || true; exit 0; fi
             if [ ! -d ".git" ]; then
               git clone -b ${{ inputs.branch || github.ref_name }} https://github.com/HishamKoptaN/green_souq_api.git .deploy-clone
               cp -a .deploy-clone/. .
