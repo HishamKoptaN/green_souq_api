@@ -25,6 +25,7 @@ jobs:
           username: ${{ vars.SSH_USER }}
           password: ${{ secrets.SSH_PASSWORD }}
           port: ${{ vars.SSH_PORT }}
+          capture_stdout: true
           script: |
             set -e
             if [ "${{ inputs.branch || github.ref_name }}" = "prod" ]; then
