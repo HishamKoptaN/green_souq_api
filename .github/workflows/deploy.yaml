@@ -17,7 +17,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: ${{ inputs.branch || github.ref_name }}
+    environment: prod
     steps:
       - uses: appleboy/ssh-action@master
         with:
@@ -27,7 +27,11 @@ jobs:
           port: ${{ vars.SSH_PORT }}
           script: |
             set -e
-            cd ${{ vars.PROJECT_PATH }}
+            if [ "${{ inputs.branch || github.ref_name }}" = "prod" ]; then
+              cd ${{ vars.PROJECT_PATH }}
+            else
+              cd domains/lawngreen-tapir-650317.hostingersite.com/public_html
+            fi
             git checkout .
             git fetch origin ${{ inputs.branch || github.ref_name }}
             git reset --hard origin/${{ inputs.branch || github.ref_name }}
