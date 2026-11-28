@@ -25,13 +25,15 @@ jobs:
           username: ${{ vars.SSH_USER }}
           password: ${{ secrets.SSH_PASSWORD }}
           port: ${{ vars.SSH_PORT }}
-          capture_stdout: true
           script: |
             set -e
             if [ "${{ inputs.branch || github.ref_name }}" = "prod" ]; then
               cd ${{ vars.PROJECT_PATH }}
             else
               cd domains/lawngreen-tapir-650317.hostingersite.com/public_html
+            fi
+            if [ ! -d ".git" ]; then
+              git clone -b ${{ inputs.branch || github.ref_name }} https://github.com/HishamKoptaN/green_souq_api.git .
             fi
             git checkout .
             git fetch origin ${{ inputs.branch || github.ref_name }}
