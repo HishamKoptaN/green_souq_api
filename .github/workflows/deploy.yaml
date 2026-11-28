@@ -14,6 +14,11 @@ on:
         options:
           - dev
           - prod
+      diagnose:
+        description: Print server PHP version and exit
+        required: false
+        type: boolean
+        default: false
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -25,8 +30,10 @@ jobs:
           username: ${{ vars.SSH_USER }}
           password: ${{ secrets.SSH_PASSWORD }}
           port: ${{ vars.SSH_PORT }}
+          capture_stdout: true
           script: |
             set -e
+            if [ "${{ inputs.diagnose }}" = "true" ]; then php -v; php -r 'echo PHP_VERSION;'; exit 0; fi
             if [ "${{ inputs.branch || github.ref_name }}" = "prod" ]; then
               cd ${{ vars.PROJECT_PATH }}
             else
