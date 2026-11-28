@@ -75,6 +75,7 @@ jobs:
               sed -i 's|^FIREBASE_ADMIN_SDK_PATH=.*|FIREBASE_ADMIN_SDK_PATH=app/firebase/dev-firebase_admin_sdk.json|' .env
             fi
             composer install --optimize-autoloader --no-dev --ignore-platform-reqs --no-scripts
+            cp -a public/. .
             if [ "${{ inputs.branch || github.ref_name }}" != "prod" ]; then
               php artisan key:generate --force
             fi
